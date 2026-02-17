@@ -26,16 +26,17 @@ import { cn } from "@/lib/utils";
 export default function CourseDetailsPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const course = COURSES.find((c) => c.id === resolvedParams.id);
-    const [activeTab, setActiveTab] = useState("Overview");
-
-    // Mock enrolled course IDs and progress - in real app, this would come from user data
-    const enrolledCourseIds = ["1", "2"];
-    const isEnrolled = course ? enrolledCourseIds.includes(course.id) : false;
-    const courseProgress = isEnrolled ? (course.id === "1" ? 45 : 65) : 0; // Mock progress
 
     if (!course) {
         notFound();
     }
+
+    const [activeTab, setActiveTab] = useState("Overview");
+
+    // Mock enrolled course IDs and progress - in real app, this would come from user data
+    const enrolledCourseIds = ["1", "2"];
+    const isEnrolled = enrolledCourseIds.includes(course.id);
+    const courseProgress = isEnrolled ? (course.id === "1" ? 45 : 65) : 0; // Mock progress
 
     const discount = Math.round(
         ((course.originalPrice - course.price) / course.originalPrice) * 100
