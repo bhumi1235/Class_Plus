@@ -33,29 +33,7 @@ export default function SignupPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
 
-                    {/* Role Selection */}
-                    <div className="grid grid-cols-2 gap-4 mb-6">
-                        <button
-                            onClick={() => setRole("student")}
-                            className={cn(
-                                "flex flex-col items-center justify-center gap-2 rounded-lg border p-4 text-sm font-medium transition-all hover:bg-gray-50",
-                                role === "student" ? "border-indigo-600 bg-indigo-50 text-indigo-600 ring-1 ring-indigo-600" : "border-gray-200 text-gray-500"
-                            )}
-                        >
-                            <GraduationCap className="h-6 w-6" />
-                            Student
-                        </button>
-                        <button
-                            onClick={() => setRole("parent")}
-                            className={cn(
-                                "flex flex-col items-center justify-center gap-2 rounded-lg border p-4 text-sm font-medium transition-all hover:bg-gray-50",
-                                role === "parent" ? "border-indigo-600 bg-indigo-50 text-indigo-600 ring-1 ring-indigo-600" : "border-gray-200 text-gray-500"
-                            )}
-                        >
-                            <UserCircle2 className="h-6 w-6" />
-                            Parent
-                        </button>
-                    </div>
+                    {/* Role Selection Removed - Defaulting to Student */}\n
 
                     <form className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
@@ -79,16 +57,7 @@ export default function SignupPage() {
                             <Input id="password" type="password" />
                         </div>
 
-                        {role === "parent" && (
-                            <div className="rounded-lg bg-indigo-50 p-4 border border-indigo-100">
-                                <h4 className="text-sm font-medium text-indigo-900 mb-2">Child's Information</h4>
-                                <div className="space-y-2">
-                                    <Label htmlFor="childId" className="text-xs">Student ID or Mobile Number</Label>
-                                    <Input id="childId" placeholder="Enter student's connected mobile" className="bg-white" />
-                                    <p className="text-[10px] text-gray-500">We'll send a verification code to this number.</p>
-                                </div>
-                            </div>
-                        )}
+
 
                         <Button className="w-full" size="lg">
                             Create Account

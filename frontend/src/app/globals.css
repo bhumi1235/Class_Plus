@@ -3,35 +3,32 @@
 @theme {
   --font-sans: "Inter", system-ui, sans-serif;
 
-  --color-primary: #4F46E5;
-  /* Indigo 600 */
+  /* PW Brand Colors - Deep Blue & White */
+  --color-primary: #1B2124;
+  /* Dark Blue/Black for primary actions/text */
   --color-primary-foreground: #FFFFFF;
 
-  --color-secondary: #E0E7FF;
-  /* Indigo 100 */
-  --color-secondary-foreground: #3730A3;
-  /* Indigo 900 */
+  --color-secondary: #5A4FCF;
+  /* PW Purple/Blue Accent */
+  --color-secondary-foreground: #FFFFFF;
 
-  --color-background: #F3F4F6;
-  /* Gray 100 */
-  --color-foreground: #111827;
-  /* Gray 900 */
+  --color-background: #FFFFFF;
+  /* Clean White Background */
+  --color-foreground: #1B2124;
+  /* Dark Text */
 
-  --color-muted: #F9FAFB;
-  /* Gray 50 */
+  --color-muted: #F8F9FA;
+  /* Light Gray for sections */
   --color-muted-foreground: #6B7280;
-  /* Gray 500 */
 
   --color-card: #FFFFFF;
-  --color-card-foreground: #111827;
+  --color-card-foreground: #1B2124;
 
   --color-border: #E5E7EB;
-  /* Gray 200 */
   --color-input: #E5E7EB;
 
-  --color-accent: #EEF2FF;
-  /* Indigo 50 */
-  --color-accent-foreground: #4F46E5;
+  --color-accent: #F3F4F6;
+  --color-accent-foreground: #1B2124;
 
   --color-destructive: #EF4444;
   --color-destructive-foreground: #FFFFFF;

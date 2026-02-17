@@ -1,35 +1,62 @@
-"use client";
-
-import { Bell, Menu } from "lucide-react";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { Search, Menu, User, Bell } from "lucide-react";
 
-export function Navbar({ onMenuClick }: { onMenuClick?: () => void }) {
+export function Navbar() {
     return (
-        <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
-            <Button variant="ghost" size="icon" className="-m-2.5 p-2.5 text-gray-700 lg:hidden" onClick={onMenuClick}>
-                <span className="sr-only">Open sidebar</span>
-                <Menu className="h-6 w-6" aria-hidden="true" />
-            </Button>
-
-            <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6 justify-end">
-                <div className="flex items-center gap-x-4 lg:gap-x-6">
-                    <Button variant="ghost" size="icon" className="-m-2.5 p-2.5 text-gray-400 hover:text-gray-500">
-                        <span className="sr-only">View notifications</span>
-                        <Bell className="h-6 w-6" aria-hidden="true" />
+        <nav className="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
+            <div className="container mx-auto flex h-16 items-center justify-between px-4">
+                {/* Logo */}
+                <div className="flex items-center gap-2">
+                    <Button variant="ghost" size="icon" className="md:hidden">
+                        <Menu className="h-6 w-6" />
                     </Button>
-                    <div className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-200" aria-hidden="true" />
-                    <div className="flex items-center gap-x-2 lg:gap-x-3">
-                        <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-medium">
-                            JD
+                    <Link href="/" className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
+                            C+
                         </div>
-                        <span className="hidden lg:flex lg:items-center">
-                            <span className="ml-1 text-sm font-semibold leading-6 text-gray-900" aria-hidden="true">
-                                John Doe
-                            </span>
-                        </span>
+                        <span>ClassPlus</span>
+                    </Link>
+                </div>
+
+                {/* Desktop Navigation */}
+                <div className="hidden md:flex items-center gap-8">
+                    <Link href="/courses" className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">
+                        Courses
+                    </Link>
+                    <Link href="/test-series" className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">
+                        Test Series
+                    </Link>
+                    <Link href="/results" className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">
+                        Results
+                    </Link>
+                    <Link href="/study-material" className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors">
+                        Study Material
+                    </Link>
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center gap-4">
+                    <div className="hidden md:flex relative">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                        <input
+                            type="text"
+                            placeholder="Search for courses..."
+                            className="h-10 w-64 rounded-full border border-gray-200 bg-gray-50 pl-10 pr-4 text-sm focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                        />
                     </div>
+
+                    <Button variant="ghost" size="icon" className="text-gray-600">
+                        <Bell className="h-5 w-5" />
+                    </Button>
+
+                    <Link href="/auth/login">
+                        <Button className="rounded-full bg-indigo-600 hover:bg-indigo-700 text-white px-6">
+                            Login
+                        </Button>
+                    </Link>
                 </div>
             </div>
-        </header>
+        </nav>
     );
 }

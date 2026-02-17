@@ -12,6 +12,9 @@ import { useRouter } from "next/navigation";
 export default function LoginPage() {
     const router = useRouter();
     const [role, setRole] = useState<"student" | "parent">("student");
+    const [identifier, setIdentifier] = useState("");
+    const [password, setPassword] = useState("");
+    const isPhone = /^\d+$/.test(identifier) && identifier.length > 0;
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [mounted, setMounted] = useState(false);
@@ -199,18 +202,27 @@ export default function LoginPage() {
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.8 }}
                     >
-                        <FloatingInput id="email" label="Email address" type="email" />
+                        <FloatingInput
+                            id="identifier"
+                            label="Email or Phone Number"
+                            type="text"
+                            value={identifier}
+                            onChange={(e) => setIdentifier(e.target.value)}
+                            prefix={isPhone ? <span className="text-gray-500 font-medium mr-1">+91</span> : null}
+                        />
 
                         <div className="relative">
                             <FloatingInput
                                 id="password"
                                 label="Password"
                                 type={showPassword ? "text" : "password"}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
                             />
                             <motion.button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-gray-100"
+                                className="absolute right-4 top-1/2 -translate-y-[60%] text-gray-400 hover:text-gray-700 transition-colors p-1 rounded-lg hover:bg-gray-100/50"
                                 whileHover={{ scale: 1.1 }}
                                 whileTap={{ scale: 0.9 }}
                             >
@@ -362,9 +374,15 @@ export default function LoginPage() {
     );
 }
 
-function FloatingInput({ id, label, type = "text" }: { id: string; label: string; type?: string }) {
+function FloatingInput({ id, label, type = "text", value, onChange, prefix }: {
+    id: string;
+    label: string;
+    type?: string;
+    value: string;
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+    prefix?: React.ReactNode;
+}) {
     const [focused, setFocused] = useState(false);
-    const [value, setValue] = useState("");
 
     return (
         <motion.div
@@ -372,32 +390,35 @@ function FloatingInput({ id, label, type = "text" }: { id: string; label: string
             whileHover={{ scale: 1.005 }}
             transition={{ duration: 0.2 }}
         >
-            <input
-                id={id}
-                type={type}
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
-                className={cn(
-                    "peer block w-full rounded-xl border-2 bg-white/50 backdrop-blur-sm px-4 py-3.5 text-sm text-gray-900 font-medium placeholder-transparent focus:outline-none transition-all duration-300",
-                    focused || value
-                        ? "border-indigo-500 bg-white shadow-[0_0_0_4px_rgba(99,102,241,0.1)] pl-4"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-white pl-4"
-                )}
-                placeholder={label}
-            />
+            <div className={cn(
+                "peer flex items-center w-full rounded-xl border-2 bg-white/50 backdrop-blur-sm px-4 py-3.5 text-sm text-gray-900 font-medium transition-all duration-300",
+                focused || value
+                    ? "border-indigo-500 bg-white shadow-[0_0_0_4px_rgba(99,102,241,0.1)]"
+                    : "border-gray-200 hover:border-gray-300 hover:bg-white"
+            )}>
+                {prefix && prefix}
+                <input
+                    id={id}
+                    type={type}
+                    value={value}
+                    onChange={onChange}
+                    onFocus={() => setFocused(true)}
+                    onBlur={() => setFocused(false)}
+                    className="w-full bg-transparent outline-none placeholder-transparent"
+                    placeholder={label}
+                />
+            </div>
             <motion.label
                 htmlFor={id}
                 className={cn(
-                    "absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-all duration-300 pointer-events-none bg-white px-2 font-medium",
+                    "absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 transition-all duration-300 pointer-events-none bg-white/0 px-2 font-medium",
                     (focused || value)
-                        ? "top-0 text-xs text-indigo-600 font-semibold"
+                        ? "top-0 left-3 -translate-y-[140%] text-xs text-indigo-600 font-semibold bg-white/80 backdrop-blur-sm rounded-md"
                         : "text-sm"
                 )}
                 initial={false}
                 animate={{
-                    scale: (focused || value) ? 0.85 : 1,
+                    scale: (focused || value) ? 1 : 1, // Fixed scale to rely on font-size change and position
                 }}
             >
                 {label}

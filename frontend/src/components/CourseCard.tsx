@@ -1,6 +1,6 @@
-import { Clock, Users, Star, ArrowRight } from "lucide-react";
+import { Clock, Users, Star, ArrowRight, BookOpen } from "lucide-react";
 import Link from "next/link";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/Card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 
@@ -17,10 +17,6 @@ export interface Course {
   isLive?: boolean;
   level?: string;
   daysLeft?: number;
-  description?: string;
-  curriculum?: { title: string; duration: string; lessons: string[] }[];
-  reviews?: { user: string; rating: number; comment: string }[];
-  features?: string[];
 }
 
 export default function CourseCard({ course, isEnrolled = false }: { course: Course; isEnrolled?: boolean }) {
@@ -29,79 +25,75 @@ export default function CourseCard({ course, isEnrolled = false }: { course: Cou
   );
 
   return (
-    <Card className="overflow-hidden flex flex-col h-full hover:shadow-lg transition-all duration-300 group cursor-pointer border-gray-200/60">
+    <Card className="group flex flex-col h-full overflow-hidden border border-gray-200 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1 rounded-2xl">
+      {/* Thumbnail Section */}
       <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
-        {/* Placeholder gradient for thumbnail */}
-        <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 to-purple-600 transition-transform duration-500 group-hover:scale-105" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
+        <img
+          src={course.thumbnail || "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1742&q=80"}
+          alt={course.title}
+          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+        />
 
-        <div className="absolute top-3 left-3 flex flex-col gap-2">
-          {isEnrolled && (
-            <Badge className="bg-green-600 hover:bg-green-700 shadow-sm">
-              Enrolled
-            </Badge>
-          )}
+        {/* Floating Badges */}
+        <div className="absolute top-3 left-3 z-20 flex flex-col gap-2">
           {course.isLive && (
-            <Badge variant="destructive" className="shadow-sm">
-              Live Class
+            <Badge className="bg-red-500 text-white border-0 shadow-sm animate-pulse">
+              LIVE
             </Badge>
           )}
           {course.level && (
-            <Badge variant="secondary" className="bg-white/90 text-gray-900 shadow-sm backdrop-blur-sm">
+            <Badge className="bg-white/90 text-gray-900 backdrop-blur-sm border-0 shadow-sm">
               {course.level}
             </Badge>
           )}
         </div>
-      </div>
 
-      <CardHeader className="p-5 pb-3">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-1 text-xs font-medium text-amber-500 bg-amber-50 px-2 py-0.5 rounded-full">
+        {/* Bottom Overlay Info */}
+        <div className="absolute bottom-3 left-4 right-4 z-20 flex items-center justify-between text-white">
+          <div className="flex items-center gap-1.5 text-xs font-medium bg-black/40 px-2 py-1 rounded-full backdrop-blur-sm">
+            <Users className="h-3 w-3" />
+            <span>{course.students.toLocaleString()}+ Enrolled</span>
+          </div>
+          <div className="flex items-center gap-1 text-xs font-medium text-yellow-400">
             <Star className="h-3 w-3 fill-current" />
             <span>{course.rating}</span>
           </div>
-          <div className="text-xs text-gray-500 flex items-center gap-1">
-            <Users className="h-3 w-3" />
-            {course.students.toLocaleString()}
-          </div>
         </div>
-        <CardTitle className="text-lg leading-tight group-hover:text-indigo-600 transition-colors line-clamp-2">
-          {course.title}
-        </CardTitle>
-        <CardDescription className="text-xs mt-1 font-medium text-gray-500">
-          by {course.instructor}
-        </CardDescription>
-      </CardHeader>
+      </div>
 
-      <CardContent className="p-5 pt-0 flex-grow">
-        <div className="flex items-center gap-4 text-xs text-gray-500 mt-2">
+      {/* Content Section */}
+      <div className="flex flex-col flex-grow p-5">
+        <h3 className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-2 md:text-xl">
+          {course.title}
+        </h3>
+
+        <div className="mt-2 flex items-center gap-4 text-xs font-medium text-gray-500">
+          <div className="flex items-center gap-1">
+            <BookOpen className="h-3.5 w-3.5" />
+            <span>{course.instructor}</span>
+          </div>
           <div className="flex items-center gap-1">
             <Clock className="h-3.5 w-3.5" />
-            {course.duration}
+            <span>{course.duration}</span>
           </div>
-          {course.daysLeft && (
-            <span className="text-indigo-600 font-medium">
-              Starts in {course.daysLeft} days
-            </span>
-          )}
         </div>
-      </CardContent>
 
-      <CardFooter className="p-5 pt-0 flex items-center justify-between border-t border-gray-50 mt-auto bg-gray-50/50">
-        <div className="flex flex-col">
-          <span className="text-xs text-gray-400 line-through">₹{course.originalPrice.toLocaleString()}</span>
-          <div className="flex items-center gap-2">
-            <span className="text-lg font-bold text-gray-900">₹{course.price.toLocaleString()}</span>
-            <Badge variant="outline" className="text-xs text-green-600 border-green-200 bg-green-50 px-1 py-0 h-5">
-              {discount}% OFF
-            </Badge>
+        <div className="mt-4 pt-4 border-t border-gray-100 flex items-end justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold text-gray-900">₹{course.price.toLocaleString()}</span>
+              <span className="text-sm text-gray-400 line-through">₹{course.originalPrice.toLocaleString()}</span>
+            </div>
+            <p className="text-xs text-green-600 font-bold">{discount}% OFF</p>
           </div>
+
+          <Button size="sm" className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200">
+            Explore
+            <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+          </Button>
         </div>
-        <Button size="sm" className="ml-4 shrink-0" asChild>
-          <Link href={`/courses/${course.id}`}>
-            View Details <ArrowRight className="ml-1 h-3 w-3" />
-          </Link>
-        </Button>
-      </CardFooter>
+      </div>
     </Card>
   );
 }
