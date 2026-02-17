@@ -1,36 +1,122 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ClassPlus - Modern Education Platform Frontend
 
-## Getting Started
+A beautiful, modern education platform built with Next.js 16, React 19, and Tailwind CSS 4.
 
-First, run the development server:
+## 🚀 Features
+
+- **Modern UI/UX**: Clean, professional design with smooth animations
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile
+- **Course Management**: Browse, enroll, and track progress in courses
+- **Live Classes**: Join live sessions with real-time updates
+- **Assignments**: Submit and track assignment progress
+- **Doubts & Q&A**: Ask questions and get help from instructors
+- **Progress Tracking**: Visual progress indicators and analytics
+- **Settings**: Customizable themes (Light/Dark/System) and preferences
+
+## 🛠️ Tech Stack
+
+- **Framework**: Next.js 16.1.6
+- **React**: 19.2.3
+- **Styling**: Tailwind CSS 4.1.18
+- **Animations**: Framer Motion 12.34.0
+- **Icons**: Lucide React
+- **UI Components**: Custom components with Radix UI primitives
+- **TypeScript**: Full type safety
+
+## 📦 Installation
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
+
+# Start production server
+npm start
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌐 Deployment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Deploy to Vercel (Recommended)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Push your code to GitHub
+2. Import your repository on [Vercel](https://vercel.com)
+3. Vercel will auto-detect Next.js and deploy
 
-## Learn More
+See [DEPLOYMENT_GUIDE.md](../DEPLOYMENT_GUIDE.md) for detailed instructions.
 
-To learn more about Next.js, take a look at the following resources:
+## 📁 Project Structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+frontend/
+├── src/
+│   ├── app/                    # Next.js app directory
+│   │   ├── (auth)/            # Authentication pages
+│   │   ├── (dashboard)/       # Dashboard pages
+│   │   └── layout.tsx         # Root layout
+│   ├── components/            # Reusable components
+│   │   ├── ui/               # UI primitives
+│   │   └── layout/           # Layout components
+│   ├── data/                 # Mock data
+│   └── lib/                  # Utilities
+├── public/                   # Static assets
+└── package.json
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 🎨 Key Pages
 
-## Deploy on Vercel
+- `/auth/login` - Login page
+- `/auth/signup` - Signup page
+- `/dashboard` - Main dashboard
+- `/courses` - Course catalog
+- `/courses/[id]` - Course details
+- `/live` - Live classes
+- `/assignments` - Assignments
+- `/doubt` - Doubts & Q&A
+- `/progress` - Progress tracking
+- `/settings` - User settings
+- `/profile` - User profile
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🔧 Configuration
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Environment Variables
+
+Create a `.env.local` file for local development:
+
+```env
+# Add your environment variables here
+# NEXT_PUBLIC_API_URL=https://your-api-url.com
+```
+
+### Tailwind CSS
+
+The project uses Tailwind CSS 4 with custom configuration in `tailwind.config.ts`.
+
+## 🎯 Development
+
+```bash
+# Run development server
+npm run dev
+
+# Lint code
+npm run lint
+
+# Build for production
+npm run build
+```
+
+## 📝 License
+
+Private - All rights reserved
+
+## 👥 Author
+
+ClassPlus Team
+
+---
+
+Built with ❤️ using Next.js and Tailwind CSS
