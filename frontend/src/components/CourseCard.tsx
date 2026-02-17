@@ -17,6 +17,11 @@ export interface Course {
   isLive?: boolean;
   level?: string;
   daysLeft?: number;
+  description?: string;
+  curriculum?: { title: string; duration: string; lessons: string[] }[];
+  reviews?: { user: string; rating: number; comment: string }[];
+  features?: string[];
+  category?: string;
 }
 
 export default function CourseCard({ course, isEnrolled = false }: { course: Course; isEnrolled?: boolean }) {
