@@ -11,6 +11,9 @@ export default function LandingPage() {
     return (
         <div className="min-h-screen flex flex-col bg-white">
             <Navbar />
+            <div className="bg-red-500 text-white text-center py-1 text-xs font-bold">
+                DEBUG MODE: V3 (Auth & Nav Updated)
+            </div>
 
             {/* Hero Section */}
             <section className="relative overflow-hidden bg-gradient-to-b from-indigo-50 to-white pt-16 pb-24 md:pt-24 md:pb-32">
