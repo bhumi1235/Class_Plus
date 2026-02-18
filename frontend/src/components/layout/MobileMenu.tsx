@@ -16,7 +16,7 @@ const NAV_LINKS = [
     { label: "Courses", href: "/courses" },
     { label: "Live", href: "/live" },
     { label: "Doubt", href: "/doubt" },
-    { label: "Profile", href: "/profile" },
+    { label: "Profile", href: "/settings" },
 ];
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
