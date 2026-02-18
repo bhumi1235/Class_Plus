@@ -4,18 +4,20 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { Search, Menu, User, LogOut } from "lucide-react";
+import { Search, Menu, User, LogOut, Settings, ChevronDown } from "lucide-react";
 import { ClassSelector } from "./ClassSelector";
 import { MobileMenu } from "./MobileMenu";
 import { cn } from "@/lib/utils";
 import { useAuthModal } from "@/store/useAuthModal";
 import { useAuth } from "@/store/useAuth";
+import { AnimatePresence, motion } from "framer-motion";
 
 export function Navbar() {
     const { openLogin, openSignup } = useAuthModal();
     const { isAuthenticated, user, logout } = useAuth();
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -28,8 +30,16 @@ export function Navbar() {
 
     const handleLogout = () => {
         logout();
+        setIsProfileOpen(false);
         router.push("/");
     };
+
+    const NAV_LINKS = [
+        { label: "Home", href: "/dashboard" },
+        { label: "Courses", href: "/courses" },
+        { label: "Live", href: "/live" },
+        { label: "Doubt", href: "/doubt" },
+    ];
 
     return (
         <>
@@ -57,12 +67,7 @@ export function Navbar() {
                         <div className="h-6 w-px bg-gray-200 mx-2" />
 
                         <div className="flex items-center gap-6">
-                            {[
-                                { label: "Courses", href: "/courses" },
-                                { label: "Batches", href: "/my-batches" },
-                                { label: "Test Series", href: "/test-series" },
-                                { label: "Scholarships", href: "/scholarships" },
-                            ].map(link => (
+                            {NAV_LINKS.map(link => (
                                 <Link
                                     key={link.href}
                                     href={link.href}
@@ -85,19 +90,63 @@ export function Navbar() {
                         <div className="hidden md:block h-6 w-px bg-gray-200" />
 
                         {isAuthenticated ? (
-                            <div className="hidden md:flex items-center gap-4">
-                                <span className="text-sm font-medium text-gray-700">
-                                    Hi, {user?.name.split(' ')[0] || 'Student'}
-                                </span>
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={handleLogout}
-                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            <div className="hidden md:block relative">
+                                <button
+                                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                                    className="flex items-center gap-2 p-1.5 pr-3 rounded-full border border-gray-200 hover:border-indigo-200 hover:bg-gray-50 transition-all"
                                 >
-                                    <LogOut className="h-4 w-4 mr-2" />
-                                    Logout
-                                </Button>
+                                    <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm">
+                                        {user?.name.charAt(0) || 'S'}
+                                    </div>
+                                    <span className="text-sm font-medium text-gray-700">
+                                        {user?.name.split(' ')[0] || 'Student'}
+                                    </span>
+                                    <ChevronDown className="h-4 w-4 text-gray-400" />
+                                </button>
+
+                                <AnimatePresence>
+                                    {isProfileOpen && (
+                                        <>
+                                            <div className="fixed inset-0 z-30" onClick={() => setIsProfileOpen(false)} />
+                                            <motion.div
+                                                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                animate={{ opacity: 1, y: 0, scale: 1 }}
+                                                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                                                transition={{ duration: 0.1 }}
+                                                className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-40 overflow-hidden"
+                                            >
+                                                <div className="px-4 py-3 border-b border-gray-50">
+                                                    <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
+                                                    <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+                                                </div>
+                                                <Link
+                                                    href="/profile"
+                                                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
+                                                    onClick={() => setIsProfileOpen(false)}
+                                                >
+                                                    <User className="h-4 w-4" />
+                                                    My Profile
+                                                </Link>
+                                                <Link
+                                                    href="/settings"
+                                                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
+                                                    onClick={() => setIsProfileOpen(false)}
+                                                >
+                                                    <Settings className="h-4 w-4" />
+                                                    Settings
+                                                </Link>
+                                                <div className="h-px bg-gray-50 my-1" />
+                                                <button
+                                                    onClick={handleLogout}
+                                                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+                                                >
+                                                    <LogOut className="h-4 w-4" />
+                                                    Logout
+                                                </button>
+                                            </motion.div>
+                                        </>
+                                    )}
+                                </AnimatePresence>
                             </div>
                         ) : (
                             /* Login Button */

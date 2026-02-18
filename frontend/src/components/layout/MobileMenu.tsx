@@ -12,12 +12,11 @@ interface MobileMenuProps {
 }
 
 const NAV_LINKS = [
+    { label: "Home", href: "/dashboard" },
     { label: "Courses", href: "/courses" },
-    { label: "My Batches", href: "/my-batches" },
-    { label: "Test Series", href: "/test-series" },
-    { label: "Scholarships", href: "/scholarships" },
-    { label: "Results", href: "/results" },
-    { label: "Study Material", href: "/study-material" },
+    { label: "Live", href: "/live" },
+    { label: "Doubt", href: "/doubt" },
+    { label: "Profile", href: "/profile" },
 ];
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
