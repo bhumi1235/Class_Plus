@@ -11,9 +11,6 @@ export default function LandingPage() {
     return (
         <div className="min-h-screen flex flex-col bg-white">
             <Navbar />
-            <div className="bg-red-500 text-white text-center py-1 text-xs font-bold">
-                DEBUG MODE: V3 (Auth & Nav Updated)
-            </div>
 
             {/* Hero Section */}
             <section className="relative overflow-hidden bg-gradient-to-b from-indigo-50 to-white pt-16 pb-24 md:pt-24 md:pb-32">
@@ -40,7 +37,7 @@ export default function LandingPage() {
                             </h1>
 
                             <p className="max-w-xl text-lg text-gray-600">
-                                Prepare for JEE, NEET, and Board Exams with India's top educators.
+                                Prepare for Competitive Exams and Boards with India's top educators.
                                 Experience interactive live classes, comprehensive study material, and personalized mentorship.
                             </p>
 
@@ -203,9 +200,9 @@ function CourseCard() {
                 />
                 <div className="absolute bottom-4 left-4 right-4 z-20">
                     <span className="inline-block rounded-md bg-indigo-600 px-2 py-1 text-xs font-bold text-white mb-2">
-                        Physics Wallah Style
+                        Bestseller
                     </span>
-                    <h3 className="text-lg font-bold text-white line-clamp-1">Lakshya JEE 2026</h3>
+                    <h3 className="text-lg font-bold text-white line-clamp-1">Complete Science Batch</h3>
                 </div>
             </div>
             <div className="p-5">

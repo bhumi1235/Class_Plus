@@ -9,9 +9,9 @@ import { BookOpen } from "lucide-react";
 const COURSES = [
   {
     id: "1",
-    title: "Lakshya JEE 2026",
+    title: "Complete JEE Prep 2026",
     thumbnail: "https://images.unsplash.com/photo-1620912189863-010350284897?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80",
-    instructor: "Alakh Pandey & Team",
+    instructor: "Expert Engineering Team",
     price: 3499,
     originalPrice: 4999,
     rating: 4.9,
@@ -24,9 +24,9 @@ const COURSES = [
   },
   {
     id: "2",
-    title: "Arjuna NEET 2026",
+    title: "NEET Success Batch 2026",
     thumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-    instructor: "Pankaj Sir & Team",
+    instructor: "Top Medical Faculty",
     price: 3999,
     originalPrice: 5999,
     rating: 4.8,
@@ -61,8 +61,8 @@ export default function MyBatchesPage() {
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${activeTab === tab.value
-                ? "bg-indigo-50 text-indigo-700"
-                : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+              ? "bg-indigo-50 text-indigo-700"
+              : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
               }`}
           >
             {tab.label}

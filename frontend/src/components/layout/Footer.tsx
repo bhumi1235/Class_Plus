@@ -43,7 +43,7 @@ export function Footer() {
                     <div>
                         <h3 className="text-white font-semibold mb-6">Popular Courses</h3>
                         <ul className="space-y-3 text-sm">
-                            <li><Link href="/courses/jee" className="hover:text-indigo-400 transition-colors">JEE Styling</Link></li>
+                            <li><Link href="/courses/jee" className="hover:text-indigo-400 transition-colors">JEE Main & Advanced</Link></li>
                             <li><Link href="/courses/neet" className="hover:text-indigo-400 transition-colors">NEET Preparation</Link></li>
                             <li><Link href="/courses/gate" className="hover:text-indigo-400 transition-colors">GATE 2026</Link></li>
                             <li><Link href="/courses/upsc" className="hover:text-indigo-400 transition-colors">UPSC CSE</Link></li>

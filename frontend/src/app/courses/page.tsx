@@ -13,9 +13,9 @@ import { motion, AnimatePresence } from "framer-motion";
 const COURSES = [
     {
         id: "1",
-        title: "Lakshya JEE 2026",
+        title: "Complete JEE Prep 2026",
         thumbnail: "https://images.unsplash.com/photo-1620912189863-010350284897?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80",
-        instructor: "Alakh Pandey & Team",
+        instructor: "Expert Engineering Team",
         price: 3499,
         originalPrice: 4999,
         rating: 4.9,
@@ -28,9 +28,9 @@ const COURSES = [
     },
     {
         id: "2",
-        title: "Arjuna NEET 2026",
+        title: "NEET Success Batch 2026",
         thumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-        instructor: "Pankaj Sir & Team",
+        instructor: "Top Medical Faculty",
         price: 3999,
         originalPrice: 5999,
         rating: 4.8,
@@ -72,9 +72,9 @@ const COURSES = [
     },
     {
         id: "5",
-        title: "GATE CSE 2026 - Parakram",
+        title: "GATE CSE 2026 - Elite",
         thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-        instructor: "Gate Wallah Team",
+        instructor: "GATE Experts Team",
         price: 5999,
         originalPrice: 9999,
         rating: 4.8,
@@ -86,9 +86,9 @@ const COURSES = [
     },
     {
         id: "6",
-        title: "MBA Pioneer 2025",
+        title: "MBA Comprehensive 2025",
         thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1630&q=80",
-        instructor: "MBA Wallah",
+        instructor: "Top MBA Faculty",
         price: 4999,
         originalPrice: 8999,
         rating: 4.6,
@@ -160,8 +160,8 @@ export default function CoursesPage() {
                                         key={category}
                                         onClick={() => setActiveCategory(category)}
                                         className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${activeCategory === category
-                                                ? "bg-indigo-600 text-white font-medium"
-                                                : "text-gray-600 hover:bg-gray-100"
+                                            ? "bg-indigo-600 text-white font-medium"
+                                            : "text-gray-600 hover:bg-gray-100"
                                             }`}
                                     >
                                         {category}
@@ -193,8 +193,8 @@ export default function CoursesPage() {
                                                     key={category}
                                                     onClick={() => { setActiveCategory(category); setShowFilters(false); }}
                                                     className={`px-3 py-1.5 rounded-full text-sm border ${activeCategory === category
-                                                            ? "bg-indigo-600 text-white border-indigo-600"
-                                                            : "border-gray-200 text-gray-600"
+                                                        ? "bg-indigo-600 text-white border-indigo-600"
+                                                        : "border-gray-200 text-gray-600"
                                                         }`}
                                                 >
                                                     {category}

@@ -17,8 +17,8 @@ const CLASSES = [
 const MOCK_COURSES: Record<string, string[]> = {
     "11": ["Physics 11 (Part 1)", "Chemistry 11 (Organic)", "Maths 11 (Calculus)", "English Core 11"],
     "12": ["Physics 12 (Optics)", "Chemistry 12 (Inorganic)", "Biology 12", "Computer Science"],
-    "jee": ["Arjuna JEE 2.0", "Lakshya JEE 2026", "Prayas Dropper Batch"],
-    "neet": ["Yakeen NEET 2.0", "Arjuna NEET", "Lakshya NEET"],
+    "jee": ["Engineering Excellence", "Advanced Math Series", "Physics Mastery"],
+    "neet": ["Medical Entrance Prep", "Biology Foundation", "Chemistry Crash Course"],
     "found": ["Olympiad Math", "NTSE Prep", "Science Foundation"],
     "gov": ["SSC CGL 2025", "Banking PO Absolute", "UPSC Prelims"]
 };
