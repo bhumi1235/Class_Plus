@@ -46,33 +46,30 @@ export function Navbar() {
         <>
             <nav
                 className={cn(
-                    "sticky top-0 z-40 w-full bg-white transition-all duration-200 border-b",
-                    scrolled ? "h-16 shadow-sm border-gray-200" : "h-[72px] border-transparent"
+                    "sticky top-0 z-40 w-full bg-white/80 backdrop-blur-md transition-all duration-200 border-b",
+                    scrolled ? "h-16 shadow-indigo-100/50 shadow-lg border-indigo-50" : "h-[72px] border-transparent"
                 )}
             >
-                <div className="container mx-auto h-full px-4 md:px-6 lg:px-8 flex items-center justify-between">
+                <div className="container mx-auto h-full px-4 md:px-6 lg:px-8 flex items-center">
 
                     {/* LEFT: Logo */}
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white font-bold text-lg shadow-indigo-200 shadow-md transition-transform group-hover:scale-105">
-                            C+
-                        </div>
-                        <span className="font-bold text-xl tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors">ClassPlus</span>
-                    </Link>
+                    <div className="flex-none">
+                        <Link href="/" className="flex items-center gap-2 group">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-600 text-white font-bold text-xl shadow-indigo-200 shadow-lg transition-transform group-hover:scale-105 group-hover:rotate-3">
+                                C+
+                            </div>
+                            <span className="font-bold text-xl tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors">ClassPlus</span>
+                        </Link>
+                    </div>
 
-                    {/* CENTER: Navigation & Class Selector */}
-                    <div className="hidden lg:flex items-center gap-6">
-
-                        <ClassSelector />
-
-                        <div className="h-6 w-px bg-gray-200 mx-2" />
-
-                        <div className="flex items-center gap-6">
+                    {/* CENTER: Navigation Links */}
+                    <div className="hidden lg:flex flex-1 items-center justify-center gap-1">
+                        <div className="flex items-center gap-1 bg-gray-50/50 p-1.5 rounded-full border border-gray-100">
                             {NAV_LINKS.map(link => (
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className="text-[15px] font-medium text-gray-600 hover:text-indigo-600 transition-colors"
+                                    className="px-5 py-2 rounded-full text-[15px] font-medium text-gray-600 hover:bg-white hover:text-indigo-600 hover:shadow-sm transition-all duration-200"
                                 >
                                     {link.label}
                                 </Link>
@@ -81,28 +78,21 @@ export function Navbar() {
                     </div>
 
                     {/* RIGHT: Actions */}
-                    <div className="flex items-center gap-3">
-                        {/* Search Icon (Desktop) */}
-                        <button className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg text-gray-500 hover:bg-gray-50 hover:text-indigo-600 transition-colors">
-                            <Search className="h-5 w-5" />
-                            <span className="text-sm font-medium">Search</span>
-                        </button>
-
-                        <div className="hidden md:block h-6 w-px bg-gray-200" />
+                    <div className="flex-none flex items-center gap-3 ml-auto lg:ml-0">
 
                         {isAuthenticated ? (
                             <div className="hidden md:block relative">
                                 <button
                                     onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                    className="flex items-center gap-2 p-1.5 pr-3 rounded-full border border-gray-200 hover:border-indigo-200 hover:bg-gray-50 transition-all"
+                                    className="flex items-center gap-2 p-1.5 pr-4 rounded-full border border-gray-200 hover:border-indigo-200 hover:bg-indigo-50/30 transition-all group"
                                 >
-                                    <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold text-sm">
+                                    <div className="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-semibold text-sm shadow-md ring-2 ring-white">
                                         {user?.name.charAt(0) || 'S'}
                                     </div>
-                                    <span className="text-sm font-medium text-gray-700">
+                                    <span className="text-sm font-semibold text-gray-700 group-hover:text-indigo-700 transition-colors">
                                         {user?.name.split(' ')[0] || 'Student'}
                                     </span>
-                                    <ChevronDown className="h-4 w-4 text-gray-400" />
+                                    <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${isProfileOpen ? 'rotate-180' : ''}`} />
                                 </button>
 
                                 <AnimatePresence>
@@ -114,36 +104,39 @@ export function Navbar() {
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, y: 10, scale: 0.95 }}
                                                 transition={{ duration: 0.1 }}
-                                                className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-100 py-1 z-40 overflow-hidden"
+                                                className="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl shadow-indigo-100 border border-gray-100 py-2 z-40 overflow-hidden"
                                             >
-                                                <div className="px-4 py-3 border-b border-gray-50">
-                                                    <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
+                                                <div className="px-4 py-3 border-b border-gray-50 text-center bg-gray-50/50">
+                                                    <p className="text-sm font-bold text-gray-900">{user?.name}</p>
                                                     <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                                                 </div>
-                                                <Link
-                                                    href="/profile"
-                                                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
-                                                    onClick={() => setIsProfileOpen(false)}
-                                                >
-                                                    <User className="h-4 w-4" />
-                                                    My Profile
-                                                </Link>
-                                                <Link
-                                                    href="/settings"
-                                                    className="flex items-center gap-2 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-indigo-600 transition-colors"
-                                                    onClick={() => setIsProfileOpen(false)}
-                                                >
-                                                    <Settings className="h-4 w-4" />
-                                                    Settings
-                                                </Link>
-                                                <div className="h-px bg-gray-50 my-1" />
-                                                <button
-                                                    onClick={handleLogout}
-                                                    className="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
-                                                >
-                                                    <LogOut className="h-4 w-4" />
-                                                    Logout
-                                                </button>
+
+                                                <div className="p-2 space-y-1">
+                                                    <Link
+                                                        href="/settings"
+                                                        className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                                        onClick={() => setIsProfileOpen(false)}
+                                                    >
+                                                        <User className="h-4 w-4" />
+                                                        My Profile
+                                                    </Link>
+                                                    <Link
+                                                        href="/settings"
+                                                        className="flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-gray-700 rounded-xl hover:bg-indigo-50 hover:text-indigo-600 transition-colors"
+                                                        onClick={() => setIsProfileOpen(false)}
+                                                    >
+                                                        <Settings className="h-4 w-4" />
+                                                        Settings
+                                                    </Link>
+                                                    <div className="h-px bg-gray-100 my-1 mx-2" />
+                                                    <button
+                                                        onClick={handleLogout}
+                                                        className="w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-red-600 rounded-xl hover:bg-red-50 transition-colors"
+                                                    >
+                                                        <LogOut className="h-4 w-4" />
+                                                        Logout
+                                                    </button>
+                                                </div>
                                             </motion.div>
                                         </>
                                     )}
@@ -151,17 +144,17 @@ export function Navbar() {
                             </div>
                         ) : (
                             /* Login Button */
-                            <div className="hidden md:flex items-center gap-4">
+                            <div className="hidden md:flex items-center gap-3">
                                 <Button
                                     variant="ghost"
-                                    className="text-gray-600 hover:text-indigo-600 font-medium"
+                                    className="text-gray-600 hover:text-indigo-600 font-medium hover:bg-indigo-50 rounded-xl px-4"
                                     onClick={openLogin}
                                 >
                                     Log in
                                 </Button>
                                 <Button
                                     onClick={openSignup}
-                                    className="rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-md shadow-indigo-100 transition-all hover:shadow-lg font-medium px-5"
+                                    className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 transition-all hover:shadow-indigo-300 font-medium px-6 h-10"
                                 >
                                     Sign Up Free
                                 </Button>
