@@ -22,6 +22,7 @@ interface Doubt {
   responses: number;
   likes: number;
   resolvedBy?: string;
+  resolution?: string; // Appended resolution field
 }
 
 const DOUBTS: Doubt[] = [
@@ -37,7 +38,8 @@ const DOUBTS: Doubt[] = [
     timeAgo: "2 hours ago",
     responses: 3,
     likes: 5,
-    resolvedBy: "Angela Yu"
+    resolvedBy: "Angela Yu",
+    resolution: "The cleanup function runs before the component unmounts AND before the effect re-runs due to dependency changes. This ensures you don't have stale listeners or subscriptions."
   },
   {
     id: 2,
@@ -64,7 +66,8 @@ const DOUBTS: Doubt[] = [
     timeAgo: "1 day ago",
     responses: 2,
     likes: 8,
-    resolvedBy: "Dr. Sharma"
+    resolvedBy: "Dr. Sharma",
+    resolution: "The rocket exerts a backward force on the exhaust gases (action), and the gases exert an equal and opposite forward force on the rocket (reaction), propelling it forward."
   },
 ];
 
@@ -224,15 +227,27 @@ export default function DoubtPage() {
                       <h3 className="font-semibold text-gray-900 group-hover:text-indigo-600 transition-colors text-lg">
                         {doubt.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+                      <p className="text-sm text-gray-600 mt-2 mb-3">
                         {doubt.description}
                       </p>
+
+                      {/* Resolution Display */}
+                      {doubt.status === "resolved" && doubt.resolution && (
+                        <div className="relative mt-3 pl-4 border-l-2 border-green-500">
+                          <p className="text-sm text-gray-700 bg-green-50/50 p-3 rounded-r-lg">
+                            <span className="font-semibold text-green-700 block mb-1">
+                              Resolution by {doubt.resolvedBy}:
+                            </span>
+                            {doubt.resolution}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardHeader>
 
-                <CardContent className="pb-3">
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                <CardContent className="pb-3 pt-0">
+                  <div className="flex items-center gap-4 text-sm text-gray-500 mt-2 border-t pt-3 border-gray-100">
                     <div className="flex items-center gap-1.5">
                       <div className="h-6 w-6 rounded-full bg-indigo-100 flex items-center justify-center text-xs font-semibold text-indigo-700">
                         {doubt.askedByAvatar}
@@ -252,21 +267,7 @@ export default function DoubtPage() {
                       {doubt.likes}
                     </span>
                   </div>
-
-                  {doubt.status === "resolved" && doubt.resolvedBy && (
-                    <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <p className="text-sm text-green-900">
-                        <span className="font-semibold">Resolved by {doubt.resolvedBy}</span>
-                      </p>
-                    </div>
-                  )}
                 </CardContent>
-
-                <CardFooter className="pt-0">
-                  <Button variant="outline" className="w-full">
-                    View Discussion
-                  </Button>
-                </CardFooter>
               </Card>
             ))}
           </div>
