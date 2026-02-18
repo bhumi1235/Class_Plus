@@ -107,7 +107,7 @@ export default function LandingPage() {
                                         </div>
                                         <div>
                                             <p className="text-xs text-gray-500">Top Result</p>
-                                            <p className="font-bold text-gray-900">AIR 1 (JEE)</p>
+                                            <p className="font-bold text-gray-900">Excellence</p>
                                         </div>
                                     </div>
                                 </motion.div>

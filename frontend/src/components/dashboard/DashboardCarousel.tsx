@@ -8,8 +8,8 @@ const CAROUSEL_ITEMS = [
     {
         id: 1,
         image: "https://images.unsplash.com/photo-1501504905252-473c47e087f8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1674&q=80",
-        title: "Master JEE Advanced 2026",
-        subtitle: "Join the toppers batch today",
+        title: "Achieve Your Dream",
+        subtitle: "Start your learning journey today",
         cta: "Enroll Now"
     },
     {
