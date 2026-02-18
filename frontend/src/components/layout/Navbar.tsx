@@ -2,15 +2,21 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { Search, Menu, User } from "lucide-react";
+import { Search, Menu, User, LogOut } from "lucide-react";
 import { ClassSelector } from "./ClassSelector";
 import { MobileMenu } from "./MobileMenu";
 import { cn } from "@/lib/utils";
+import { useAuthModal } from "@/store/useAuthModal";
+import { useAuth } from "@/store/useAuth";
 
 export function Navbar() {
+    const { openLogin, openSignup } = useAuthModal();
+    const { isAuthenticated, user, logout } = useAuth();
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
+    const router = useRouter();
 
     useEffect(() => {
         const handleScroll = () => {
@@ -19,6 +25,11 @@ export function Navbar() {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    const handleLogout = () => {
+        logout();
+        router.push("/");
+    };
 
     return (
         <>
@@ -73,12 +84,39 @@ export function Navbar() {
 
                         <div className="hidden md:block h-6 w-px bg-gray-200" />
 
-                        {/* Login Button */}
-                        <Link href="/auth/login" className="hidden md:block">
-                            <Button className="rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-md shadow-indigo-100 transition-all hover:shadow-lg font-medium px-5">
-                                Login
-                            </Button>
-                        </Link>
+                        {isAuthenticated ? (
+                            <div className="hidden md:flex items-center gap-4">
+                                <span className="text-sm font-medium text-gray-700">
+                                    Hi, {user?.name.split(' ')[0] || 'Student'}
+                                </span>
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleLogout}
+                                    className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                >
+                                    <LogOut className="h-4 w-4 mr-2" />
+                                    Logout
+                                </Button>
+                            </div>
+                        ) : (
+                            /* Login Button */
+                            <div className="hidden md:flex items-center gap-4">
+                                <Button
+                                    variant="ghost"
+                                    className="text-gray-600 hover:text-indigo-600 font-medium"
+                                    onClick={openLogin}
+                                >
+                                    Log in
+                                </Button>
+                                <Button
+                                    onClick={openSignup}
+                                    className="rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white shadow-md shadow-indigo-100 transition-all hover:shadow-lg font-medium px-5"
+                                >
+                                    Sign Up Free
+                                </Button>
+                            </div>
+                        )}
 
                         {/* Mobile Hamburger */}
                         <Button

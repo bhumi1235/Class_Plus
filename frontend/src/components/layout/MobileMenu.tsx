@@ -4,6 +4,7 @@ import { X, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuthModal } from "@/store/useAuthModal";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -20,6 +21,18 @@ const NAV_LINKS = [
 ];
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
+    const { openLogin, openSignup } = useAuthModal();
+
+    const handleLogin = () => {
+        onClose();
+        openLogin();
+    };
+
+    const handleSignup = () => {
+        onClose();
+        openSignup();
+    };
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -61,11 +74,12 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
                         {/* Footer Actions */}
                         <div className="p-4 border-t border-gray-100 space-y-3">
-                            <Link href="/auth/login" onClick={onClose}>
-                                <Button className="w-full h-12 text-base bg-indigo-600 hover:bg-indigo-700">
-                                    Login / Register
-                                </Button>
-                            </Link>
+                            <Button onClick={handleLogin} variant="outline" className="w-full h-12 text-base border-gray-300 text-gray-700 hover:bg-gray-50">
+                                Log In
+                            </Button>
+                            <Button onClick={handleSignup} className="w-full h-12 text-base bg-indigo-600 hover:bg-indigo-700 text-white">
+                                Create Free Account
+                            </Button>
                         </div>
                     </div>
                 </motion.div>
