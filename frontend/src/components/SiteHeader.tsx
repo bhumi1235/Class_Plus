@@ -74,13 +74,27 @@ export default function SiteHeader() {
             <span className="absolute right-0.5 top-0.5 h-2 w-2 rounded-full bg-red-500" />
           </button>
           {isLoggedIn ? (
-            <Link
-              href="/profile"
-              className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/10"
-            >
-              <User className="h-4 w-4" />
-              <span className="hidden sm:inline">Profile</span>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/10"
+              >
+                <User className="h-4 w-4" />
+                <span className="hidden sm:inline">Profile</span>
+              </Link>
+              <button
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    window.localStorage.removeItem("userRole");
+                    window.location.href = "/";
+                  }
+                }}
+                className="rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/10 hover:text-red-300 transition-colors"
+                title="Logout"
+              >
+                Logout
+              </button>
+            </div>
           ) : (
             <Link
               href="/auth/login"

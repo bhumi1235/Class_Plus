@@ -73,12 +73,32 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
                         {/* Footer Actions */}
                         <div className="p-4 border-t border-gray-100 space-y-3">
-                            <Button onClick={handleLogin} variant="outline" className="w-full h-12 text-base border-gray-300 text-gray-700 hover:bg-gray-50">
-                                Log In
-                            </Button>
-                            <Button onClick={handleSignup} className="w-full h-12 text-base bg-indigo-600 hover:bg-indigo-700 text-white">
-                                Create Free Account
-                            </Button>
+                            {/* We can verify auth state here similarly to SiteHeader if needed, 
+                                but for now let's use the same localStorage check for consistency or pass it as prop/context.
+                                Since this is a client component, we can use localStorage directly or useAuth.
+                             */}
+                            {(typeof window !== 'undefined' && window.localStorage.getItem('userRole')) ? (
+                                <Button
+                                    onClick={() => {
+                                        window.localStorage.removeItem('userRole');
+                                        window.location.href = "/";
+                                        onClose();
+                                    }}
+                                    variant="outline"
+                                    className="w-full h-12 text-base border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 hover:border-red-300"
+                                >
+                                    Log Out
+                                </Button>
+                            ) : (
+                                <>
+                                    <Button onClick={handleLogin} variant="outline" className="w-full h-12 text-base border-gray-300 text-gray-700 hover:bg-gray-50">
+                                        Log In
+                                    </Button>
+                                    <Button onClick={handleSignup} className="w-full h-12 text-base bg-indigo-600 hover:bg-indigo-700 text-white">
+                                        Create Free Account
+                                    </Button>
+                                </>
+                            )}
                         </div>
                     </div>
                 </motion.div>
