@@ -83,7 +83,7 @@ export default function SiteHeader() {
             </Link>
           ) : (
             <Link
-              href="/login"
+              href="/auth/login"
               className="rounded-lg px-4 py-2 text-sm font-semibold text-white outline outline-2 outline-white/50 hover:bg-white/10"
               style={{ backgroundColor: "var(--header-bg)" }}
             >

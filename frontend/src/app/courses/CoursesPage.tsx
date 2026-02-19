@@ -6,11 +6,9 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import CourseCard from "@/components/CourseCard";
 import { Button } from "@/components/ui/Button";
-import { Search, Filter, X, BookOpen, Layers } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Search, BookOpen, Layers, Sparkles } from "lucide-react";
 import { useAuth } from "@/store/useAuth";
 import { useAuthModal } from "@/store/useAuthModal";
-import Link from "next/link";
 
 // Mock Data (Expanded for "My Courses")
 const COURSES = [
@@ -113,17 +111,10 @@ export default function CoursesPage() {
     const [activeTab, setActiveTab] = useState<"all" | "my">("all");
     const [activeCategory, setActiveCategory] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
-    const [showFilters, setShowFilters] = useState(false);
 
     // Auth Check
     useEffect(() => {
         if (!isAuthenticated) {
-            // Option 1: Redirect to home
-            // router.push("/");
-            // openLogin(); // And open login
-
-            // Option 2: Show a restricted view or just redirect. 
-            // The prompt says "only visible after logging", so we redirect.
             const timeout = setTimeout(() => {
                 router.push("/");
                 openLogin();
@@ -133,7 +124,7 @@ export default function CoursesPage() {
     }, [isAuthenticated, router, openLogin]);
 
     if (!isAuthenticated) {
-        return null; // Or a loading spinner while redirecting
+        return null;
     }
 
     // Mock enrolled courses (Subset of COURSES)
@@ -149,168 +140,112 @@ export default function CoursesPage() {
     });
 
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="min-h-screen bg-gray-50/50 flex flex-col font-sans">
             <Navbar />
 
-            <main className="flex-1 container mx-auto px-4 py-8">
+            <main className="flex-1 container mx-auto px-4 py-8 max-w-7xl">
 
-                {/* Header Section */}
-                <div className="mb-8 space-y-6">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-900">Courses</h1>
-                            <p className="text-gray-600">Manage your learning and explore new skills.</p>
-                        </div>
-
-                        {/* Tabs */}
-                        <div className="bg-white p-1 rounded-xl border border-gray-200 inline-flex shadow-sm">
-                            <button
-                                onClick={() => setActiveTab("all")}
-                                className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === "all"
-                                    ? "bg-indigo-600 text-white shadow-md"
-                                    : "text-gray-600 hover:bg-gray-50"
-                                    }`}
-                            >
-                                <BookOpen className="h-4 w-4" />
-                                All Courses
-                            </button>
-                            <button
-                                onClick={() => setActiveTab("my")}
-                                className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === "my"
-                                    ? "bg-indigo-600 text-white shadow-md"
-                                    : "text-gray-600 hover:bg-gray-50"
-                                    }`}
-                            >
-                                <Layers className="h-4 w-4" />
-                                My Courses
-                            </button>
-                        </div>
+                {/* Header & Tabs */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                    <div>
+                        <h1 className="text-3xl font-extrabold text-gray-900 tracking-tight">
+                            {activeTab === 'all' ? 'Explore Courses' : 'My Learning'}
+                        </h1>
+                        <p className="text-gray-500 mt-2 text-lg">
+                            {activeTab === 'all' ? 'Discover new skills and reach your goals' : 'Continue where you left off'}
+                        </p>
                     </div>
 
-                    <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-                        {/* Search */}
-                        <div className="relative w-full md:w-96">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <div className="bg-gray-100 p-1.5 rounded-2xl inline-flex shadow-inner">
+                        <button
+                            onClick={() => setActiveTab("all")}
+                            className={`px-6 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === "all"
+                                ? "bg-white text-indigo-600 shadow-md transform scale-105"
+                                : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+                                }`}
+                        >
+                            <BookOpen className="h-4 w-4" />
+                            All Courses
+                        </button>
+                        <button
+                            onClick={() => setActiveTab("my")}
+                            className={`px-6 py-3 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${activeTab === "my"
+                                ? "bg-white text-indigo-600 shadow-md transform scale-105"
+                                : "text-gray-500 hover:text-gray-700 hover:bg-gray-200/50"
+                                }`}
+                        >
+                            <Layers className="h-4 w-4" />
+                            My Courses
+                        </button>
+                    </div>
+                </div>
+
+                {/* Search & Categories (Only for All Courses) */}
+                {activeTab === "all" && (
+                    <div className="mb-12 space-y-8">
+                        {/* Search Bar */}
+                        <div className="relative max-w-2xl mx-auto">
+                            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                                <Search className="h-5 w-5 text-gray-400" />
+                            </div>
                             <input
                                 type="text"
-                                placeholder="Search courses..."
-                                className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all bg-white"
+                                placeholder="Search for courses, topics, or exams..."
+                                className="w-full h-14 pl-12 pr-6 rounded-2xl border-2 border-transparent bg-white shadow-lg shadow-gray-200/50 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 outline-none transition-all text-gray-900 placeholder:text-gray-400 text-lg"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
 
-                        {/* Filter Toggle (Mobile) */}
-                        <Button variant="outline" className="md:hidden w-full" onClick={() => setShowFilters(!showFilters)}>
-                            <Filter className="h-4 w-4 mr-2" /> Filters
-                        </Button>
-                    </div>
-                </div>
-
-                <div className="flex gap-8">
-                    {/* Sidebar Filters (Desktop) - Only show for All Courses */}
-                    {activeTab === "all" && (
-                        <aside className="hidden md:block w-64 shrink-0 space-y-8">
-                            <div>
-                                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                    <Filter className="h-4 w-4" /> Filters
-                                </h3>
-                                <div className="space-y-2">
-                                    <p className="text-sm font-medium text-gray-500 mb-2">Categories</p>
-                                    {CATEGORIES.map(category => (
-                                        <button
-                                            key={category}
-                                            onClick={() => setActiveCategory(category)}
-                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${activeCategory === category
-                                                ? "bg-indigo-600 text-white font-medium"
-                                                : "text-gray-600 hover:bg-gray-100"
-                                                }`}
-                                        >
-                                            {category}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </aside>
-                    )}
-
-                    {/* Course Grid */}
-                    <div className="flex-1">
-                        {/* Mobile Filter Sheet */}
-                        <AnimatePresence>
-                            {showFilters && activeTab === "all" && (
-                                <motion.div
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: "auto", opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    className="md:hidden mb-6 overflow-hidden"
+                        {/* Category Pills */}
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                            {CATEGORIES.map(category => (
+                                <button
+                                    key={category}
+                                    onClick={() => setActiveCategory(category)}
+                                    className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all border ${activeCategory === category
+                                        ? "bg-gray-900 text-white border-gray-900 shadow-lg transform -translate-y-0.5"
+                                        : "bg-white text-gray-600 border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                                        }`}
                                 >
-                                    <div className="bg-white p-4 rounded-xl border border-gray-200">
-                                        <div className="flex justify-between items-center mb-4">
-                                            <h3 className="font-semibold">Categories</h3>
-                                            <Button variant="ghost" size="sm" onClick={() => setShowFilters(false)}><X className="h-4 w-4" /></Button>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2">
-                                            {CATEGORIES.map(category => (
-                                                <button
-                                                    key={category}
-                                                    onClick={() => { setActiveCategory(category); setShowFilters(false); }}
-                                                    className={`px-3 py-1.5 rounded-full text-sm border ${activeCategory === category
-                                                        ? "bg-indigo-600 text-white border-indigo-600"
-                                                        : "border-gray-200 text-gray-600"
-                                                        }`}
-                                                >
-                                                    {category}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        {filteredCourses.length > 0 ? (
-                            <div className={`grid grid-cols-1 sm:grid-cols-2 ${activeTab === 'all' ? 'lg:grid-cols-3' : 'lg:grid-cols-3'} gap-6`}>
-                                {filteredCourses.map(course => (
-                                    <CourseCard
-                                        key={course.id}
-                                        course={course}
-                                        isEnrolled={activeTab === 'my'}
-                                        href={`/courses/${course.id}`}
-                                    />
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
-                                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                                    <Search className="h-8 w-8 text-gray-400" />
-                                </div>
-                                <h3 className="text-lg font-semibold text-gray-900">No courses found</h3>
-                                <p className="text-gray-500">
-                                    {activeTab === 'my'
-                                        ? "You haven't enrolled in any courses yet."
-                                        : "Try adjusting your search or filters."}
-                                </p>
-                                {activeTab === 'all' ? (
-                                    <Button
-                                        variant="link"
-                                        className="mt-2 text-indigo-600"
-                                        onClick={() => { setActiveCategory("All"); setSearchQuery(""); }}
-                                    >
-                                        Clear all filters
-                                    </Button>
-                                ) : (
-                                    <Button
-                                        variant="link"
-                                        className="mt-2 text-indigo-600"
-                                        onClick={() => setActiveTab("all")}
-                                    >
-                                        Browse All Courses
-                                    </Button>
-                                )}
-                            </div>
-                        )}
+                                    {category === "All" && <Sparkles className="h-3 w-3 inline-block mr-2 text-yellow-500" />}
+                                    {category}
+                                </button>
+                            ))}
+                        </div>
                     </div>
+                )}
+
+                {/* Course Grid */}
+                <div className="min-h-[400px]">
+                    {filteredCourses.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                            {filteredCourses.map(course => (
+                                <CourseCard
+                                    key={course.id}
+                                    course={course}
+                                    isEnrolled={activeTab === 'my'}
+                                    href={`/courses/${course.id}`}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-24">
+                            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-100 mb-6">
+                                <Search className="h-10 w-10 text-gray-400" />
+                            </div>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">No courses found</h3>
+                            <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+                                We couldn't find any courses matching your search. Try different keywords or categories.
+                            </p>
+                            <Button
+                                variant="outline"
+                                onClick={() => { setActiveCategory("All"); setSearchQuery(""); }}
+                            >
+                                Clear Filters
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </main>
 

@@ -11,7 +11,16 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
     const router = useRouter();
+    // Use a custom hook or check local storage directly if useAuth is not available/reliable here
+    // Assuming local storage 'userRole' key is used for auth persistence as seen in SiteHeader
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.localStorage.getItem("userRole")) {
+            router.push("/dashboard");
+        }
+    }, [router]);
+
     const [role, setRole] = useState<"student" | "parent">("student");
+
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const isPhone = /^\d+$/.test(identifier) && identifier.length > 0;

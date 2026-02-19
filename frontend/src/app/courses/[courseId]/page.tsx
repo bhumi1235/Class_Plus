@@ -8,11 +8,14 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { EnrollmentModal } from "@/components/courses/EnrollmentModal";
 
 // Mock Data
 const COURSE_DATA = {
+    id: "1", // Added ID for modal
     title: "Complete Science Batch (Class 12)",
     description: "Master Physics, Chemistry, and Biology with expert faculty. Comprehensive coverage of Class 12 syllabus.",
+    price: 3499, // Added price for modal
     rating: 4.8,
     students: 12500,
     days: 45, // Days remaining or duration
@@ -58,6 +61,7 @@ export default function CourseDetailsPage() {
     const params = useParams();
     const [activeTab, setActiveTab] = useState("Curriculum");
     const [isEnrolled, setIsEnrolled] = useState(false); // Toggle for demo
+    const [isEnrollmentOpen, setIsEnrollmentOpen] = useState(false);
 
     // Simulate data fetching based on params.courseId
     const course = COURSE_DATA;
@@ -211,17 +215,28 @@ export default function CourseDetailsPage() {
                             <div className="flex-1">
                                 <p className="text-xs text-gray-500 line-through">₹4,999</p>
                                 <div className="flex items-baseline gap-2">
-                                    <span className="text-2xl font-extrabold text-gray-900">₹3,499</span>
+                                    <span className="text-2xl font-extrabold text-gray-900">₹{course.price}</span>
                                     <span className="text-xs font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded">30% OFF</span>
                                 </div>
                             </div>
-                            <Button className="flex-[2] h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-200 text-lg font-bold">
+                            <Button
+                                onClick={() => setIsEnrollmentOpen(true)}
+                                className="flex-[2] h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-200 text-lg font-bold"
+                            >
                                 Enroll Now
                             </Button>
                         </>
                     )}
                 </div>
             </div>
+
+            <EnrollmentModal
+                isOpen={isEnrollmentOpen}
+                onClose={() => setIsEnrollmentOpen(false)}
+                courseCode={course.id}
+                price={course.price}
+                courseTitle={course.title}
+            />
         </div>
     );
 }

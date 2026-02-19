@@ -2,65 +2,24 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ArrowRight, Star, CirclePlay, Users, Trophy, BookOpen, CircleCheck, GraduationCap } from "lucide-react";
+import { ArrowRight, Star, CirclePlay, Users, BookOpen, Quote } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { useState } from "react";
-import { EnrollmentModal } from "@/components/courses/EnrollmentModal";
 import { useAuth } from "@/store/useAuth";
 import { useAuthModal } from "@/store/useAuthModal";
 import { useRouter } from "next/navigation";
-import CourseCard, { Course } from "@/components/CourseCard";
 
-// Mock Data (Shared with Courses Page for consistency)
-const POPULAR_COURSES: Course[] = [
-    {
-        id: "1",
-        title: "Complete JEE Prep 2026",
-        thumbnail: "https://images.unsplash.com/photo-1620912189863-010350284897?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80",
-        instructor: "Expert Engineering Team",
-        price: 3499,
-        originalPrice: 4999,
-        rating: 4.9,
-        students: 15400,
-        duration: "12 Months",
-        isLive: true,
-        level: "Class 12",
-        category: "JEE"
-    },
-    {
-        id: "2",
-        title: "NEET Success Batch 2026",
-        thumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-        instructor: "Top Medical Faculty",
-        price: 3999,
-        originalPrice: 5999,
-        rating: 4.8,
-        students: 22000,
-        duration: "12 Months",
-        isLive: true,
-        level: "Class 11",
-        category: "NEET"
-    },
-    {
-        id: "3",
-        title: "UPSC CSE 2026 Foundation",
-        thumbnail: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-        instructor: "Top IAS Officers",
-        price: 9999,
-        originalPrice: 19999,
-        rating: 4.7,
-        students: 5000,
-        duration: "18 Months",
-        isLive: false,
-        level: "Graduate",
-        category: "UPSC"
-    }
-];
 
 export default function LandingPage() {
-    const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+    const { isAuthenticated } = useAuth();
+    const router = useRouter();
+    const { openLogin } = useAuthModal();
+
+    if (isAuthenticated) {
+        router.push("/dashboard");
+        return null; // Prevent rendering while redirecting
+    }
 
     return (
         <div className="min-h-screen flex flex-col bg-white font-sans selection:bg-indigo-100 selection:text-indigo-700">
@@ -101,24 +60,34 @@ export default function LandingPage() {
                             </p>
 
                             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                                <ProtectedLink href="/courses" className="w-full sm:w-auto">
+                                <ProtectedButton onClick={() => router.push("/courses")} className="w-full sm:w-auto">
                                     <Button size="lg" className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl h-14 px-8 text-lg shadow-xl shadow-indigo-200 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                                         Explore Courses
                                         <ArrowRight className="ml-2 h-5 w-5" />
                                     </Button>
-                                </ProtectedLink>
-                                <Link href="#demo" className="w-full sm:w-auto">
-                                    <Button variant="outline" size="lg" className="w-full sm:w-auto border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-2xl h-14 px-8 text-lg text-gray-600">
+                                </ProtectedButton>
+                                <ProtectedButton
+                                    onClick={() => {
+                                        // Placeholder for Demo action
+                                        console.log("Watch Demo clicked");
+                                    }}
+                                    className="w-full sm:w-auto"
+                                >
+                                    <Button
+                                        variant="outline"
+                                        size="lg"
+                                        className="w-full sm:w-auto border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-2xl h-14 px-8 text-lg text-gray-600"
+                                    >
                                         <CirclePlay className="mr-2 h-5 w-5 text-indigo-500" />
                                         Watch Demo
                                     </Button>
-                                </Link>
+                                </ProtectedButton>
                             </div>
 
                             <div className="flex items-center justify-center lg:justify-start gap-8 pt-6 border-t border-gray-100/50">
                                 <div className="flex -space-x-4">
                                     {[1, 2, 3, 4].map((i) => (
-                                        <div key={i} className={`h-12 w-12 rounded-full border-4 border-white bg-gray-200 bg-cover bg-center shadow-md`} style={{ backgroundImage: `url('https://i.pravatar.cc/100?img=${i + 10}')` }} />
+                                        <div key={i} className="h-12 w-12 rounded-full border-4 border-white bg-gray-200 bg-cover bg-center shadow-md" style={{ backgroundImage: `url('https://i.pravatar.cc/100?img=${i + 10}')` }} />
                                     ))}
                                     <div className="flex h-12 w-12 items-center justify-center rounded-full border-4 border-white bg-indigo-50 text-xs font-bold text-indigo-600 shadow-md">
                                         +2M
@@ -135,7 +104,7 @@ export default function LandingPage() {
                             </div>
                         </motion.div>
 
-                        {/* Image/Visual */}
+                        {/* Image/Visual - Floating Cards Removed */}
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
@@ -152,48 +121,11 @@ export default function LandingPage() {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent" />
                                 </div>
-
-                                {/* Floating Cards */}
-                                <motion.div
-                                    initial={{ y: 20 }}
-                                    animate={{ y: [0, -12, 0] }}
-                                    transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-                                    className="absolute bottom-12 left-12 rounded-3xl bg-white/90 backdrop-blur-md p-5 shadow-xl border border-white/50 max-w-[220px]"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-green-100 rounded-2xl text-green-600">
-                                            <Trophy className="h-6 w-6" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Top Result</p>
-                                            <p className="font-bold text-gray-900 text-lg">Excellence</p>
-                                        </div>
-                                    </div>
-                                </motion.div>
-
-                                <motion.div
-                                    initial={{ y: -20 }}
-                                    animate={{ y: [0, 12, 0] }}
-                                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-                                    className="absolute top-12 right-12 rounded-3xl bg-white/90 backdrop-blur-md p-5 shadow-xl border border-white/50"
-                                >
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-indigo-100 rounded-2xl text-indigo-600">
-                                            <Users className="h-6 w-6" />
-                                        </div>
-                                        <div>
-                                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">Live Learners</p>
-                                            <p className="font-bold text-gray-900 text-lg">15k+</p>
-                                        </div>
-                                    </div>
-                                </motion.div>
                             </div>
                         </motion.div>
                     </div>
                 </div>
             </section>
-
-
 
             {/* Stats Section */}
             <section className="bg-white py-16 border-y border-gray-100/50">
@@ -217,67 +149,81 @@ export default function LandingPage() {
                 </div>
             </section>
 
-            {/* Featured Courses */}
+            {/* Student Stories Section (Replaces Popular Courses) */}
             <section className="py-24 bg-gray-50/50">
                 <div className="container mx-auto px-4">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-                        <div className="max-w-xl">
-                            <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">Popular Courses</h2>
-                            <p className="mt-3 text-lg text-gray-500">Explore our most rated courses designed by experts to help you crack your exams.</p>
-                        </div>
-                        <ProtectedLink href="/courses" className="hidden md:flex items-center text-indigo-600 font-semibold hover:text-indigo-700 bg-white px-5 py-2.5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
-                            View All Courses <ArrowRight className="ml-2 h-4 w-4" />
-                        </ProtectedLink>
+                    <div className="text-center max-w-3xl mx-auto mb-16">
+                        <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">Inspiring Student Stories</h2>
+                        <p className="text-lg text-gray-500">Hear from our students who have transformed their careers and achieved their dreams with us.</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {POPULAR_COURSES.map((course) => (
-                            <CourseCard
-                                key={course.id}
-                                course={course}
-                                onClick={() => setSelectedCourse(course)}
-                            />
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {[
+                            {
+                                name: "Ananya Sharma",
+                                role: "JEE Advanced AIR 45",
+                                image: "https://i.pravatar.cc/150?img=5",
+                                quote: "The structured curriculum and 24/7 doubt support were game changers for me. I couldn't have cracked JEE without ClassPlus."
+                            },
+                            {
+                                name: "Rahul Verma",
+                                role: "NEET Top Ranker",
+                                image: "https://i.pravatar.cc/150?img=11",
+                                quote: "Live interactions with teachers made complex topics so easy to understand. The mock tests were exactly like the real exam."
+                            },
+                            {
+                                name: "Priya Patel",
+                                role: "Cleared UPSC CSE",
+                                image: "https://i.pravatar.cc/150?img=9",
+                                quote: "Consistency is key for UPSC, and ClassPlus helped me stay consistent with their daily targets and mentorship program."
+                            }
+                        ].map((story, idx) => (
+                            <div key={idx} className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                                <Quote className="h-10 w-10 text-indigo-200 mb-6" />
+                                <p className="text-gray-600 mb-8 leading-relaxed italic">"{story.quote}"</p>
+                                <div className="flex items-center gap-4">
+                                    <img src={story.image} alt={story.name} className="h-12 w-12 rounded-full object-cover" />
+                                    <div>
+                                        <h4 className="font-bold text-gray-900">{story.name}</h4>
+                                        <p className="text-sm text-indigo-600 font-medium">{story.role}</p>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
                     </div>
 
-                    <div className="mt-12 text-center md:hidden">
-                        <ProtectedLink href="/courses">
-                            <Button variant="outline" className="w-full h-12 rounded-xl text-base border-gray-300">View All Courses</Button>
-                        </ProtectedLink>
+                    <div className="mt-16 text-center">
+                        <Link href="/success-stories" passHref>
+                            <Button variant="outline" className="h-12 px-8 rounded-xl text-base border-gray-300">
+                                View More Stories
+                            </Button>
+                        </Link>
                     </div>
                 </div>
             </section>
-
-            <EnrollmentModal
-                isOpen={!!selectedCourse}
-                onClose={() => setSelectedCourse(null)}
-                courseCode={selectedCourse?.id || ""}
-                price={selectedCourse?.price || 0}
-                courseTitle={selectedCourse?.title || ""}
-            />
 
             <Footer />
         </div>
     );
 }
 
-function ProtectedLink({ href, children, className }: { href: string, children: React.ReactNode, className?: string }) {
+function ProtectedButton({ onClick, children, className }: { onClick: () => void, children: React.ReactNode, className?: string }) {
     const { isAuthenticated } = useAuth();
     const { openLogin } = useAuthModal();
-    const router = useRouter();
 
     const handleClick = (e: React.MouseEvent) => {
         e.preventDefault();
+        e.stopPropagation();
         if (isAuthenticated) {
-            router.push(href);
+            onClick();
         } else {
             openLogin();
         }
     };
 
     return (
-        <a href={href} onClick={handleClick} className={className}>
+        <div onClick={handleClick} className={className}>
             {children}
-        </a>
+        </div>
     );
 }
