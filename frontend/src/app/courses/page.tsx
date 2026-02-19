@@ -1,15 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import CourseCard from "@/components/CourseCard";
 import { Button } from "@/components/ui/Button";
-import { Search, Filter, X } from "lucide-react";
-import { Badge } from "@/components/ui/Badge";
+import { Search, Filter, X, BookOpen, Layers } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/store/useAuth";
+import { useAuthModal } from "@/store/useAuthModal";
+import Link from "next/link";
 
-// Mock Data
+// Mock Data (Expanded for "My Courses")
 const COURSES = [
     {
         id: "1",
@@ -104,11 +107,41 @@ const COURSES = [
 const CATEGORIES = ["All", "JEE", "NEET", "UPSC", "GATE", "Coding", "MBA"];
 
 export default function CoursesPage() {
+    const { isAuthenticated } = useAuth();
+    const { openLogin } = useAuthModal();
+    const router = useRouter();
+    const [activeTab, setActiveTab] = useState<"all" | "my">("all");
     const [activeCategory, setActiveCategory] = useState("All");
     const [searchQuery, setSearchQuery] = useState("");
     const [showFilters, setShowFilters] = useState(false);
 
-    const filteredCourses = COURSES.filter(course => {
+    // Auth Check
+    useEffect(() => {
+        if (!isAuthenticated) {
+            // Option 1: Redirect to home
+            // router.push("/");
+            // openLogin(); // And open login
+
+            // Option 2: Show a restricted view or just redirect. 
+            // The prompt says "only visible after logging", so we redirect.
+            const timeout = setTimeout(() => {
+                router.push("/");
+                openLogin();
+            }, 100);
+            return () => clearTimeout(timeout);
+        }
+    }, [isAuthenticated, router, openLogin]);
+
+    if (!isAuthenticated) {
+        return null; // Or a loading spinner while redirecting
+    }
+
+    // Mock enrolled courses (Subset of COURSES)
+    const myCourses = COURSES.slice(0, 2).map(c => ({ ...c, isEnrolled: true }));
+
+    const displayCourses = activeTab === "all" ? COURSES : myCourses;
+
+    const filteredCourses = displayCourses.filter(course => {
         const matchesCategory = activeCategory === "All" || course.category === activeCategory;
         const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             course.instructor.toLowerCase().includes(searchQuery.toLowerCase());
@@ -122,9 +155,37 @@ export default function CoursesPage() {
             <main className="flex-1 container mx-auto px-4 py-8">
 
                 {/* Header Section */}
-                <div className="mb-8 space-y-4">
-                    <h1 className="text-3xl font-bold text-gray-900">Explore Courses</h1>
-                    <p className="text-gray-600">Find the perfect course to achieve your goals.</p>
+                <div className="mb-8 space-y-6">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">Courses</h1>
+                            <p className="text-gray-600">Manage your learning and explore new skills.</p>
+                        </div>
+
+                        {/* Tabs */}
+                        <div className="bg-white p-1 rounded-xl border border-gray-200 inline-flex shadow-sm">
+                            <button
+                                onClick={() => setActiveTab("all")}
+                                className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === "all"
+                                    ? "bg-indigo-600 text-white shadow-md"
+                                    : "text-gray-600 hover:bg-gray-50"
+                                    }`}
+                            >
+                                <BookOpen className="h-4 w-4" />
+                                All Courses
+                            </button>
+                            <button
+                                onClick={() => setActiveTab("my")}
+                                className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 ${activeTab === "my"
+                                    ? "bg-indigo-600 text-white shadow-md"
+                                    : "text-gray-600 hover:bg-gray-50"
+                                    }`}
+                            >
+                                <Layers className="h-4 w-4" />
+                                My Courses
+                            </button>
+                        </div>
+                    </div>
 
                     <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
                         {/* Search */}
@@ -132,8 +193,8 @@ export default function CoursesPage() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search for courses, exams, or instructors..."
-                                className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all"
+                                placeholder="Search courses..."
+                                className="w-full h-11 pl-10 pr-4 rounded-xl border border-gray-200 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-all bg-white"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
@@ -147,35 +208,37 @@ export default function CoursesPage() {
                 </div>
 
                 <div className="flex gap-8">
-                    {/* Sidebar Filters (Desktop) */}
-                    <aside className="hidden md:block w-64 shrink-0 space-y-8">
-                        <div>
-                            <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <Filter className="h-4 w-4" /> Filters
-                            </h3>
-                            <div className="space-y-2">
-                                <p className="text-sm font-medium text-gray-500 mb-2">Categories</p>
-                                {CATEGORIES.map(category => (
-                                    <button
-                                        key={category}
-                                        onClick={() => setActiveCategory(category)}
-                                        className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${activeCategory === category
-                                            ? "bg-indigo-600 text-white font-medium"
-                                            : "text-gray-600 hover:bg-gray-100"
-                                            }`}
-                                    >
-                                        {category}
-                                    </button>
-                                ))}
+                    {/* Sidebar Filters (Desktop) - Only show for All Courses */}
+                    {activeTab === "all" && (
+                        <aside className="hidden md:block w-64 shrink-0 space-y-8">
+                            <div>
+                                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                    <Filter className="h-4 w-4" /> Filters
+                                </h3>
+                                <div className="space-y-2">
+                                    <p className="text-sm font-medium text-gray-500 mb-2">Categories</p>
+                                    {CATEGORIES.map(category => (
+                                        <button
+                                            key={category}
+                                            onClick={() => setActiveCategory(category)}
+                                            className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors ${activeCategory === category
+                                                ? "bg-indigo-600 text-white font-medium"
+                                                : "text-gray-600 hover:bg-gray-100"
+                                                }`}
+                                        >
+                                            {category}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    </aside>
+                        </aside>
+                    )}
 
                     {/* Course Grid */}
                     <div className="flex-1">
-                        {/* Mobile Filter Sheet (Simplified) */}
+                        {/* Mobile Filter Sheet */}
                         <AnimatePresence>
-                            {showFilters && (
+                            {showFilters && activeTab === "all" && (
                                 <motion.div
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: "auto", opacity: 1 }}
@@ -207,25 +270,44 @@ export default function CoursesPage() {
                         </AnimatePresence>
 
                         {filteredCourses.length > 0 ? (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <div className={`grid grid-cols-1 sm:grid-cols-2 ${activeTab === 'all' ? 'lg:grid-cols-3' : 'lg:grid-cols-3'} gap-6`}>
                                 {filteredCourses.map(course => (
-                                    <CourseCard key={course.id} course={course} />
+                                    <CourseCard
+                                        key={course.id}
+                                        course={course}
+                                        isEnrolled={activeTab === 'my'}
+                                        href={`/courses/${course.id}`}
+                                    />
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-20">
+                            <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-200">
                                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
                                     <Search className="h-8 w-8 text-gray-400" />
                                 </div>
                                 <h3 className="text-lg font-semibold text-gray-900">No courses found</h3>
-                                <p className="text-gray-500">Try adjusting your search or filters.</p>
-                                <Button
-                                    variant="link"
-                                    className="mt-2 text-indigo-600"
-                                    onClick={() => { setActiveCategory("All"); setSearchQuery(""); }}
-                                >
-                                    Clear all filters
-                                </Button>
+                                <p className="text-gray-500">
+                                    {activeTab === 'my'
+                                        ? "You haven't enrolled in any courses yet."
+                                        : "Try adjusting your search or filters."}
+                                </p>
+                                {activeTab === 'all' ? (
+                                    <Button
+                                        variant="link"
+                                        className="mt-2 text-indigo-600"
+                                        onClick={() => { setActiveCategory("All"); setSearchQuery(""); }}
+                                    >
+                                        Clear all filters
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="link"
+                                        className="mt-2 text-indigo-600"
+                                        onClick={() => setActiveTab("all")}
+                                    >
+                                        Browse All Courses
+                                    </Button>
+                                )}
                             </div>
                         )}
                     </div>

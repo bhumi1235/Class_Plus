@@ -8,6 +8,9 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { useState } from "react";
 import { EnrollmentModal } from "@/components/courses/EnrollmentModal";
+import { useAuth } from "@/store/useAuth";
+import { useAuthModal } from "@/store/useAuthModal";
+import { useRouter } from "next/navigation";
 
 export default function LandingPage() {
     return (
@@ -49,12 +52,12 @@ export default function LandingPage() {
                             </p>
 
                             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                                <Link href="/courses" className="w-full sm:w-auto">
+                                <ProtectedLink href="/courses" className="w-full sm:w-auto">
                                     <Button size="lg" className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl h-14 px-8 text-lg shadow-xl shadow-indigo-200 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
                                         Explore Courses
                                         <ArrowRight className="ml-2 h-5 w-5" />
                                     </Button>
-                                </Link>
+                                </ProtectedLink>
                                 <Link href="#demo" className="w-full sm:w-auto">
                                     <Button variant="outline" size="lg" className="w-full sm:w-auto border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 rounded-2xl h-14 px-8 text-lg text-gray-600">
                                         <CirclePlay className="mr-2 h-5 w-5 text-indigo-500" />
@@ -173,9 +176,9 @@ export default function LandingPage() {
                             <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight">Popular Courses</h2>
                             <p className="mt-3 text-lg text-gray-500">Explore our most rated courses designed by experts to help you crack your exams.</p>
                         </div>
-                        <Link href="/courses" className="hidden md:flex items-center text-indigo-600 font-semibold hover:text-indigo-700 bg-white px-5 py-2.5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
+                        <ProtectedLink href="/courses" className="hidden md:flex items-center text-indigo-600 font-semibold hover:text-indigo-700 bg-white px-5 py-2.5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all">
                             View All Courses <ArrowRight className="ml-2 h-4 w-4" />
-                        </Link>
+                        </ProtectedLink>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -185,9 +188,9 @@ export default function LandingPage() {
                     </div>
 
                     <div className="mt-12 text-center md:hidden">
-                        <Link href="/courses">
+                        <ProtectedLink href="/courses">
                             <Button variant="outline" className="w-full h-12 rounded-xl text-base border-gray-300">View All Courses</Button>
-                        </Link>
+                        </ProtectedLink>
                     </div>
                 </div>
             </section>
@@ -196,6 +199,29 @@ export default function LandingPage() {
         </div>
     );
 }
+
+function ProtectedLink({ href, children, className }: { href: string, children: React.ReactNode, className?: string }) {
+    const { isAuthenticated } = useAuth();
+    const { openLogin } = useAuthModal();
+    const router = useRouter();
+
+    const handleClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        if (isAuthenticated) {
+            router.push(href);
+        } else {
+            openLogin();
+        }
+    };
+
+    return (
+        <a href={href} onClick={handleClick} className={className}>
+            {children}
+        </a>
+    );
+}
+
+
 
 function CourseCard() {
     const [isEnrollOpen, setIsEnrollOpen] = useState(false);

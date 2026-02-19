@@ -1,8 +1,9 @@
 import { Clock, Users, Star, ArrowRight, BookOpen } from "lucide-react";
 import Link from "next/link";
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/Card";
+import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { cn } from "@/lib/utils";
 
 export interface Course {
   id: string;
@@ -24,13 +25,21 @@ export interface Course {
   category?: string;
 }
 
-export default function CourseCard({ course, isEnrolled = false }: { course: Course; isEnrolled?: boolean }) {
+interface CourseCardProps {
+  course: Course;
+  isEnrolled?: boolean;
+  onClick?: () => void;
+  href?: string;
+  className?: string;
+}
+
+export default function CourseCard({ course, isEnrolled = false, onClick, href, className }: CourseCardProps) {
   const discount = Math.round(
     ((course.originalPrice - course.price) / course.originalPrice) * 100
   );
 
-  return (
-    <Card className="group flex flex-col h-full overflow-hidden border border-gray-200 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1 rounded-2xl">
+  const CardContent = (
+    <div className={cn("group flex flex-col h-full overflow-hidden border border-gray-200 bg-white transition-all duration-300 hover:shadow-xl hover:-translate-y-1 rounded-2xl cursor-pointer", className)}>
       {/* Thumbnail Section */}
       <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent z-10" />
@@ -93,12 +102,19 @@ export default function CourseCard({ course, isEnrolled = false }: { course: Cou
             <p className="text-xs text-green-600 font-bold">{discount}% OFF</p>
           </div>
 
-          <Button size="sm" className="rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-200">
+          {/* Render as div to avoid button-in-link issues if parent is link */}
+          <div className="h-9 px-4 rounded-lg bg-indigo-600 text-white shadow-md shadow-indigo-200 flex items-center justify-center text-sm font-medium group-hover:bg-indigo-700 transition-colors">
             Explore
             <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-          </Button>
+          </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
+
+  if (href) {
+    return <Link href={href} className="block h-full">{CardContent}</Link>;
+  }
+
+  return <div onClick={onClick} className="h-full block">{CardContent}</div>;
 }
