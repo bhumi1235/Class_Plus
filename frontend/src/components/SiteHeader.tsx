@@ -7,6 +7,7 @@ import { BookOpen, Home, Video, HelpCircle, BarChart2, User, Bell } from "lucide
 import { cn } from "@/lib/utils";
 
 import { useAuth } from "@/store/useAuth";
+import { useAuthModal } from "@/store/useAuthModal";
 
 const navLinks = [
   { name: "Home", href: "/", icon: Home },
@@ -19,6 +20,7 @@ const navLinks = [
 export default function SiteHeader() {
   const pathname = usePathname();
   const { isAuthenticated, user, logout } = useAuth();
+  const { openLogin } = useAuthModal();
 
   if (pathname === "/login") return null;
 
@@ -91,13 +93,13 @@ export default function SiteHeader() {
               </button>
             </div>
           ) : (
-            <Link
-              href="/auth/login"
+            <button
+              onClick={openLogin}
               className="rounded-lg px-4 py-2 text-sm font-semibold text-white outline outline-2 outline-white/50 hover:bg-white/10"
               style={{ backgroundColor: "var(--header-bg)" }}
             >
               Login
-            </Link>
+            </button>
           )}
         </div>
       </div>
