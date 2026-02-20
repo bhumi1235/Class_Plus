@@ -13,7 +13,6 @@ import { useAuth } from "@/store/useAuth";
 import { AnimatePresence, motion } from "framer-motion";
 
 export function Navbar() {
-    const { openLogin, openSignup } = useAuthModal();
     const { isAuthenticated, user, logout } = useAuth();
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
@@ -36,7 +35,7 @@ export function Navbar() {
 
     const handleNavClick = (href: string) => {
         if (href === "/courses" && !isAuthenticated) {
-            openLogin();
+            router.push("/auth/login");
             return;
         }
         router.push(href);
@@ -149,12 +148,12 @@ export function Navbar() {
                                 <Button
                                     variant="ghost"
                                     className="text-gray-600 hover:text-indigo-600 font-medium hover:bg-indigo-50 rounded-xl px-4"
-                                    onClick={openLogin}
+                                    onClick={() => router.push("/auth/login")}
                                 >
                                     Log in
                                 </Button>
                                 <Button
-                                    onClick={openSignup}
+                                    onClick={() => router.push("/auth/signup")}
                                     className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-200 transition-all hover:shadow-indigo-300 font-medium px-6 h-10"
                                 >
                                     Sign Up Free
