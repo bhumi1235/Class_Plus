@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthModal } from "@/store/useAuthModal";
+import { useAuth } from "@/store/useAuth";
 
 interface MobileMenuProps {
     isOpen: boolean;
@@ -21,6 +22,7 @@ const NAV_LINKS = [
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     const { openLogin, openSignup } = useAuthModal();
+    const { isAuthenticated, logout } = useAuth();
 
     const handleLogin = () => {
         onClose();
@@ -77,10 +79,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                                 but for now let's use the same localStorage check for consistency or pass it as prop/context.
                                 Since this is a client component, we can use localStorage directly or useAuth.
                              */}
-                            {(typeof window !== 'undefined' && window.localStorage.getItem('userRole')) ? (
+                            {isAuthenticated ? (
                                 <Button
                                     onClick={() => {
-                                        window.localStorage.removeItem('userRole');
+                                        logout();
                                         window.location.href = "/";
                                         onClose();
                                     }}

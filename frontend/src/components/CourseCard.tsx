@@ -19,7 +19,8 @@ export interface Course {
   level?: string;
   daysLeft?: number;
   description?: string;
-  curriculum?: { title: string; duration: string; lessons: string[] }[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  curriculum?: any[];
   reviews?: { user: string; rating: number; comment: string }[];
   features?: string[];
   category?: string;

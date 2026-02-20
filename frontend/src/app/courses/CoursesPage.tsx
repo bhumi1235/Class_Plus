@@ -9,98 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Search, BookOpen, Layers, Sparkles } from "lucide-react";
 import { useAuth } from "@/store/useAuth";
 import { useAuthModal } from "@/store/useAuthModal";
-
-// Mock Data (Expanded for "My Courses")
-const COURSES = [
-    {
-        id: "1",
-        title: "Complete JEE Prep 2026",
-        thumbnail: "https://images.unsplash.com/photo-1620912189863-010350284897?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80",
-        instructor: "Expert Engineering Team",
-        price: 3499,
-        originalPrice: 4999,
-        rating: 4.9,
-        students: 15400,
-        duration: "12 Months",
-        isLive: true,
-        level: "Class 12",
-        daysLeft: 5,
-        category: "JEE"
-    },
-    {
-        id: "2",
-        title: "NEET Success Batch 2026",
-        thumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-        instructor: "Top Medical Faculty",
-        price: 3999,
-        originalPrice: 5999,
-        rating: 4.8,
-        students: 22000,
-        duration: "12 Months",
-        isLive: true,
-        level: "Class 11",
-        daysLeft: 2,
-        category: "NEET"
-    },
-    {
-        id: "3",
-        title: "UPSC CSE 2026 Foundation",
-        thumbnail: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-        instructor: "Top IAS Officers",
-        price: 9999,
-        originalPrice: 19999,
-        rating: 4.7,
-        students: 5000,
-        duration: "18 Months",
-        isLive: false,
-        level: "Graduate",
-        category: "UPSC"
-    },
-    {
-        id: "4",
-        title: "Full Stack Web Development",
-        thumbnail: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?ixlib=rb-4.0.3&auto=format&fit=crop&w=1631&q=80",
-        instructor: "Hitesh Choudhary",
-        price: 2999,
-        originalPrice: 6999,
-        rating: 4.9,
-        students: 12000,
-        duration: "6 Months",
-        isLive: true,
-        level: "Beginner",
-        daysLeft: 10,
-        category: "Coding"
-    },
-    {
-        id: "5",
-        title: "GATE CSE 2026 - Elite",
-        thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
-        instructor: "GATE Experts Team",
-        price: 5999,
-        originalPrice: 9999,
-        rating: 4.8,
-        students: 8000,
-        duration: "12 Months",
-        isLive: false,
-        level: "Engineering",
-        category: "GATE"
-    },
-    {
-        id: "6",
-        title: "MBA Comprehensive 2025",
-        thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1630&q=80",
-        instructor: "Top MBA Faculty",
-        price: 4999,
-        originalPrice: 8999,
-        rating: 4.6,
-        students: 3000,
-        duration: "8 Months",
-        isLive: true,
-        level: "Graduate",
-        daysLeft: 15,
-        category: "MBA"
-    }
-];
+import { COURSES, ENROLLED_COURSE_IDS } from "@/lib/courseData";
 
 const CATEGORIES = ["All", "JEE", "NEET", "UPSC", "GATE", "Coding", "MBA"];
 
@@ -127,8 +36,8 @@ export default function CoursesPage() {
         return null;
     }
 
-    // Mock enrolled courses (Subset of COURSES)
-    const myCourses = COURSES.slice(0, 2).map(c => ({ ...c, isEnrolled: true }));
+    // My Courses: only enrolled ones
+    const myCourses = COURSES.filter(c => ENROLLED_COURSE_IDS.includes(c.id));
 
     const displayCourses = activeTab === "all" ? COURSES : myCourses;
 

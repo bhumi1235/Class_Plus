@@ -173,7 +173,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
                                     </div>
 
                                     {course.curriculum ? (
-                                        course.curriculum.map((section, idx) => (
+                                        course.curriculum.map((section: { title: string; duration: string; lessons: string[] }, idx: number) => (
                                             <div key={idx} className="rounded-lg border border-gray-200 bg-white overflow-hidden">
                                                 <div className="flex items-center justify-between bg-gray-50/50 px-4 py-3 cursor-pointer hover:bg-gray-50">
                                                     <div className="flex items-center gap-3">
@@ -185,7 +185,7 @@ export default function CourseDetailsPage({ params }: { params: Promise<{ id: st
                                                     <div className="text-xs text-gray-500">{section.duration}</div>
                                                 </div>
                                                 <div className="divide-y divide-gray-100">
-                                                    {section.lessons.map((lesson, lIdx) => (
+                                                    {section.lessons.map((lesson: string, lIdx: number) => (
                                                         <div key={lIdx} className="flex items-center gap-3 px-4 py-3 pl-12 hover:bg-gray-50/50 text-sm text-gray-600">
                                                             <PlayCircle className="h-4 w-4 text-gray-400" />
                                                             <span>{lesson}</span>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Star, CirclePlay, Users, BookOpen, Quote } from "lucide-react";
@@ -16,10 +17,14 @@ export default function LandingPage() {
     const router = useRouter();
     const { openLogin } = useAuthModal();
 
-    if (isAuthenticated) {
-        router.push("/dashboard");
-        return null; // Prevent rendering while redirecting
-    }
+    useEffect(() => {
+        if (isAuthenticated) {
+            router.push("/dashboard");
+        }
+    }, [isAuthenticated, router]);
+
+    // Don't render while redirecting
+    if (isAuthenticated) return null;
 
     return (
         <div className="min-h-screen flex flex-col bg-white font-sans selection:bg-indigo-100 selection:text-indigo-700">

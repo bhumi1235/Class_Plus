@@ -1,0 +1,178 @@
+// Shared course definitions used across CoursesPage and CourseDetailsPage
+
+export interface CourseItem {
+    id: string;
+    title: string;
+    description: string;
+    thumbnail: string;
+    instructor: string;
+    price: number;
+    originalPrice: number;
+    rating: number;
+    students: number;
+    duration: string;
+    isLive?: boolean;
+    level?: string;
+    daysLeft?: number;
+    category: string;
+    tabs: string[];
+    curriculum: {
+        id: number;
+        title: string;
+        duration: string;
+        type: "video" | "worksheet";
+        isCompleted: boolean;
+        isLocked: boolean;
+    }[];
+}
+
+export const COURSES: CourseItem[] = [
+    {
+        id: "1",
+        title: "Complete JEE Prep 2026",
+        description: "Master Physics, Chemistry, and Mathematics with India's top IIT faculty. Comprehensive coverage of all Class 11 & 12 topics with 500+ hours of recorded lectures, live doubt sessions, and full-length mock tests.",
+        thumbnail: "https://images.unsplash.com/photo-1620912189863-010350284897?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80",
+        instructor: "Expert Engineering Team",
+        price: 3499,
+        originalPrice: 4999,
+        rating: 4.9,
+        students: 15400,
+        duration: "12 Months",
+        isLive: true,
+        level: "Class 12",
+        daysLeft: 5,
+        category: "JEE",
+        tabs: ["Curriculum", "Materials", "Announcements"],
+        curriculum: [
+            { id: 1, title: "Introduction to Mechanics", duration: "45 mins", type: "video", isCompleted: true, isLocked: false },
+            { id: 2, title: "Laws of Motion", duration: "60 mins", type: "video", isCompleted: false, isLocked: false },
+            { id: 3, title: "Practice Worksheet - 1", duration: "30 mins", type: "worksheet", isCompleted: false, isLocked: true },
+            { id: 4, title: "Work, Energy & Power", duration: "55 mins", type: "video", isCompleted: false, isLocked: true },
+        ],
+    },
+    {
+        id: "2",
+        title: "NEET Success Batch 2026",
+        description: "The most comprehensive NEET preparation course with expert medical faculty. Covers Biology, Physics, and Chemistry with special focus on high-weightage topics.",
+        thumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+        instructor: "Top Medical Faculty",
+        price: 3999,
+        originalPrice: 5999,
+        rating: 4.8,
+        students: 22000,
+        duration: "12 Months",
+        isLive: true,
+        level: "Class 11",
+        daysLeft: 2,
+        category: "NEET",
+        tabs: ["Curriculum", "Materials", "Announcements"],
+        curriculum: [
+            { id: 1, title: "Cell Biology Fundamentals", duration: "50 mins", type: "video", isCompleted: true, isLocked: false },
+            { id: 2, title: "Human Physiology - I", duration: "70 mins", type: "video", isCompleted: false, isLocked: false },
+            { id: 3, title: "Chapter Test - Biology", duration: "45 mins", type: "worksheet", isCompleted: false, isLocked: true },
+            { id: 4, title: "Genetics & Evolution", duration: "65 mins", type: "video", isCompleted: false, isLocked: true },
+        ],
+    },
+    {
+        id: "3",
+        title: "UPSC CSE 2026 Foundation",
+        description: "Start your UPSC journey with a strong foundation. Covers GS Papers 1–4, CSAT, and optional subjects with guidance from IAS, IPS, and IFS officers.",
+        thumbnail: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+        instructor: "Top IAS Officers",
+        price: 9999,
+        originalPrice: 19999,
+        rating: 4.7,
+        students: 5000,
+        duration: "18 Months",
+        isLive: false,
+        level: "Graduate",
+        category: "UPSC",
+        tabs: ["Curriculum", "Materials", "Announcements"],
+        curriculum: [
+            { id: 1, title: "Indian History - Ancient Period", duration: "90 mins", type: "video", isCompleted: false, isLocked: false },
+            { id: 2, title: "Indian Polity - Constitution", duration: "80 mins", type: "video", isCompleted: false, isLocked: false },
+            { id: 3, title: "Current Affairs - Jan 2026", duration: "60 mins", type: "worksheet", isCompleted: false, isLocked: true },
+            { id: 4, title: "Economy & Development", duration: "75 mins", type: "video", isCompleted: false, isLocked: true },
+        ],
+    },
+    {
+        id: "4",
+        title: "Full Stack Web Development",
+        description: "Become a full-stack developer with React, Node.js, MongoDB, and more. Build 10+ real-world projects and get job-ready in 6 months.",
+        thumbnail: "https://images.unsplash.com/photo-1587620962725-abab7fe55159?ixlib=rb-4.0.3&auto=format&fit=crop&w=1631&q=80",
+        instructor: "Hitesh Choudhary",
+        price: 2999,
+        originalPrice: 6999,
+        rating: 4.9,
+        students: 12000,
+        duration: "6 Months",
+        isLive: true,
+        level: "Beginner",
+        daysLeft: 10,
+        category: "Coding",
+        tabs: ["Curriculum", "Materials", "Announcements"],
+        curriculum: [
+            { id: 1, title: "HTML & CSS Foundations", duration: "60 mins", type: "video", isCompleted: true, isLocked: false },
+            { id: 2, title: "JavaScript Essentials", duration: "90 mins", type: "video", isCompleted: false, isLocked: false },
+            { id: 3, title: "JS Assignment - 1", duration: "30 mins", type: "worksheet", isCompleted: false, isLocked: true },
+            { id: 4, title: "React Fundamentals", duration: "120 mins", type: "video", isCompleted: false, isLocked: true },
+        ],
+    },
+    {
+        id: "5",
+        title: "GATE CSE 2026 - Elite",
+        description: "Crack GATE with India's finest Computer Science faculty. Covers all GATE CSE topics with previous year analysis, mock tests, and live sessions.",
+        thumbnail: "https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80",
+        instructor: "GATE Experts Team",
+        price: 5999,
+        originalPrice: 9999,
+        rating: 4.8,
+        students: 8000,
+        duration: "12 Months",
+        isLive: false,
+        level: "Engineering",
+        category: "GATE",
+        tabs: ["Curriculum", "Materials", "Announcements"],
+        curriculum: [
+            { id: 1, title: "Data Structures - Arrays", duration: "75 mins", type: "video", isCompleted: false, isLocked: false },
+            { id: 2, title: "Algorithms - Sorting", duration: "80 mins", type: "video", isCompleted: false, isLocked: false },
+            { id: 3, title: "GATE PYQ Test", duration: "180 mins", type: "worksheet", isCompleted: false, isLocked: true },
+            { id: 4, title: "OS - Process Management", duration: "70 mins", type: "video", isCompleted: false, isLocked: true },
+        ],
+    },
+    {
+        id: "6",
+        title: "MBA Comprehensive 2025",
+        description: "Prepare for CAT, XAT, GMAT and more with expert MBA faculty. Covers Quantitative Aptitude, Verbal, Data Interpretation, and Logical Reasoning.",
+        thumbnail: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1630&q=80",
+        instructor: "Top MBA Faculty",
+        price: 4999,
+        originalPrice: 8999,
+        rating: 4.6,
+        students: 3000,
+        duration: "8 Months",
+        isLive: true,
+        level: "Graduate",
+        daysLeft: 15,
+        category: "MBA",
+        tabs: ["Curriculum", "Materials", "Announcements"],
+        curriculum: [
+            { id: 1, title: "Quantitative Aptitude - Numbers", duration: "60 mins", type: "video", isCompleted: false, isLocked: false },
+            { id: 2, title: "Verbal Ability - RC", duration: "50 mins", type: "video", isCompleted: false, isLocked: false },
+            { id: 3, title: "DI Practice Set", duration: "45 mins", type: "worksheet", isCompleted: false, isLocked: true },
+            { id: 4, title: "Logical Reasoning - Puzzles", duration: "55 mins", type: "video", isCompleted: false, isLocked: true },
+        ],
+    },
+];
+
+// Mock: IDs of courses the logged‑in student is enrolled in
+// In a real app this would come from the backend/auth context
+export const ENROLLED_COURSE_IDS: string[] = ["1", "2"];
+
+export function getCourseById(id: string): CourseItem | undefined {
+    return COURSES.find((c) => c.id === id);
+}
+
+export function isEnrolledIn(courseId: string): boolean {
+    return ENROLLED_COURSE_IDS.includes(courseId);
+}

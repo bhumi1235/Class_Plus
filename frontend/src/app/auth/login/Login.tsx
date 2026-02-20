@@ -3,24 +3,17 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
-import { GraduationCap, UserCircle2, Loader2, Eye, EyeOff, ArrowRight, Sparkles } from "lucide-react";
+import { GraduationCap, UserCircle2, Loader2, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { motion, LayoutGroup, AnimatePresence } from "framer-motion";
-
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/store/useAuth";
 
 export default function LoginPage() {
     const router = useRouter();
-    // Use a custom hook or check local storage directly if useAuth is not available/reliable here
-    // Assuming local storage 'userRole' key is used for auth persistence as seen in SiteHeader
-    useEffect(() => {
-        if (typeof window !== "undefined" && window.localStorage.getItem("userRole")) {
-            router.push("/dashboard");
-        }
-    }, [router]);
+    const { login, isAuthenticated } = useAuth();
 
     const [role, setRole] = useState<"student" | "parent">("student");
-
     const [identifier, setIdentifier] = useState("");
     const [password, setPassword] = useState("");
     const isPhone = /^\d+$/.test(identifier) && identifier.length > 0;
@@ -32,10 +25,17 @@ export default function LoginPage() {
         setMounted(true);
     }, []);
 
+    // Redirect to dashboard if already logged in
+    useEffect(() => {
+        if (isAuthenticated) {
+            router.push("/dashboard");
+        }
+    }, [isAuthenticated, router]);
+
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        // Simulate authentication - redirect to dashboard after animation
+        login({ name: "User", email: identifier });
         setTimeout(() => {
             router.push("/dashboard");
         }, 1500);

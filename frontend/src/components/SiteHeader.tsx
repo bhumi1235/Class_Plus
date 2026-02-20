@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import { BookOpen, Home, Video, HelpCircle, BarChart2, User, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+import { useAuth } from "@/store/useAuth";
+
 const navLinks = [
   { name: "Home", href: "/", icon: Home },
   { name: "Courses", href: "/courses", icon: BookOpen },
@@ -16,12 +18,7 @@ const navLinks = [
 
 export default function SiteHeader() {
   const pathname = usePathname();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    setIsLoggedIn(!!window.localStorage.getItem("userRole"));
-  }, [pathname]);
+  const { isAuthenticated, user, logout } = useAuth();
 
   if (pathname === "/login") return null;
 
@@ -73,7 +70,7 @@ export default function SiteHeader() {
             <Bell className="h-5 w-5" />
             <span className="absolute right-0.5 top-0.5 h-2 w-2 rounded-full bg-red-500" />
           </button>
-          {isLoggedIn ? (
+          {isAuthenticated ? (
             <div className="flex items-center gap-2">
               <Link
                 href="/profile"
@@ -84,10 +81,8 @@ export default function SiteHeader() {
               </Link>
               <button
                 onClick={() => {
-                  if (typeof window !== "undefined") {
-                    window.localStorage.removeItem("userRole");
-                    window.location.href = "/";
-                  }
+                  logout();
+                  window.location.href = "/";
                 }}
                 className="rounded-lg px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/10 hover:text-red-300 transition-colors"
                 title="Logout"
