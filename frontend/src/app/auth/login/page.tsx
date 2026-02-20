@@ -1,5 +1,5 @@
-import Login from "./Login";
+import { redirect } from "next/navigation";
 
-export default function Page() {
-    return <Login />;
+export default function LoginPage() {
+    redirect("/");
 }

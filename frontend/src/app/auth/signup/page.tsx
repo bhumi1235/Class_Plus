@@ -1,5 +1,5 @@
-import Signup from "./Signup";
+import { redirect } from "next/navigation";
 
-export default function Page() {
-    return <Signup />;
+export default function SignupPage() {
+    redirect("/");
 }
