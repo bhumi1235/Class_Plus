@@ -11,16 +11,18 @@ import { Button } from "@/components/ui/Button";
 import { PlayCircle, FileText, HelpCircle, BarChart2, Calendar } from "lucide-react";
 
 export default function DashboardPage() {
-    const { isAuthenticated, login } = useAuth();
+    const { isAuthenticated } = useAuth();
     const router = useRouter();
 
-    // Temporary auto-login for development, remove for production if real auth is connected
+    // Redirect to login if not authenticated
     useEffect(() => {
         if (!isAuthenticated) {
-            // Uncomment to force login in demo if needed, or rely on them logging in via modal
-            login({ name: "John Doe", email: "john@example.com" });
+            router.push("/auth/login");
         }
-    }, [isAuthenticated, login]);
+    }, [isAuthenticated, router]);
+
+    if (!isAuthenticated) return null;
+
 
     const QUICK_ACTIONS = [
         { label: "Live Classes", icon: PlayCircle, color: "text-red-500 bg-red-50", href: "/live" },

@@ -31,7 +31,7 @@ export function Navbar() {
     const handleLogout = () => {
         logout();
         setIsProfileOpen(false);
-        router.push("/");
+        window.location.href = "/auth/login";
     };
 
     const handleNavClick = (href: string) => {
