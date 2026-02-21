@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, GraduationCap, Mail, Phone, KeyRound, Eye, EyeOff, CheckCircle2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
+import { API_FORGOT_PASSWORD_BASE, FORGOT_PASSWORD_PATHS } from "@/lib/api";
 
 type Step = "identify" | "otp" | "reset" | "success";
 
@@ -52,19 +53,43 @@ export default function ForgotPasswordPage() {
         if (!identifier.trim()) return setError("Please enter your email or phone number.");
         setError("");
         setLoading(true);
-        await new Promise((r) => setTimeout(r, 1200)); // simulate API
-        setLoading(false);
-        setStep("otp");
-        startResendTimer();
+        try {
+            const body: Record<string, string> = {};
+            if (/^\d+$/.test(identifier)) body.mobile = identifier;
+            else body.email = identifier;
+            const res = await fetch(`${API_FORGOT_PASSWORD_BASE}${FORGOT_PASSWORD_PATHS.forgotPassword}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.status) throw new Error(data.message || "Could not send OTP.");
+            setLoading(false);
+            setStep("otp");
+            startResendTimer();
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Something went wrong.");
+            setLoading(false);
+        }
     };
 
     const handleResendOtp = async () => {
         if (resendCooldown > 0) return;
         setLoading(true);
-        await new Promise((r) => setTimeout(r, 1000));
-        setLoading(false);
-        setOtp(["", "", "", "", "", ""]);
-        startResendTimer();
+        try {
+            const body: Record<string, string> = {};
+            if (/^\d+$/.test(identifier)) body.mobile = identifier;
+            else body.email = identifier;
+            await fetch(`${API_FORGOT_PASSWORD_BASE}${FORGOT_PASSWORD_PATHS.forgotPassword}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+        } catch { /* ignore */ } finally {
+            setOtp(["", "", "", "", "", ""]);
+            startResendTimer();
+            setLoading(false);
+        }
     };
 
     const handleVerifyOtp = async (e: React.FormEvent) => {
@@ -73,20 +98,48 @@ export default function ForgotPasswordPage() {
         if (code.length < 6) return setError("Please enter the full 6-digit OTP.");
         setError("");
         setLoading(true);
-        await new Promise((r) => setTimeout(r, 1200));
-        setLoading(false);
-        setStep("reset");
+        try {
+            const body: Record<string, string> = { otp: code };
+            if (/^\d+$/.test(identifier)) body.mobile = identifier;
+            else body.email = identifier;
+            const res = await fetch(`${API_FORGOT_PASSWORD_BASE}${FORGOT_PASSWORD_PATHS.verifyForgotPasswordOtp}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.status) throw new Error(data.message || "Invalid OTP.");
+            setLoading(false);
+            setStep("reset");
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Invalid OTP. Try again.");
+            setLoading(false);
+        }
     };
 
     const handleResetPassword = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (newPassword.length < 8) return setError("Password must be at least 8 characters.");
+        if (newPassword.length < 6) return setError("Password must be at least 6 characters.");
         if (newPassword !== confirmPassword) return setError("Passwords do not match.");
         setError("");
         setLoading(true);
-        await new Promise((r) => setTimeout(r, 1500));
-        setLoading(false);
-        setStep("success");
+        try {
+            const body: Record<string, string> = { newPassword };
+            if (/^\d+$/.test(identifier)) body.mobile = identifier;
+            else body.email = identifier;
+            const res = await fetch(`${API_FORGOT_PASSWORD_BASE}${FORGOT_PASSWORD_PATHS.resetPassword}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.status) throw new Error(data.message || "Reset failed.");
+            setLoading(false);
+            setStep("success");
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Something went wrong.");
+            setLoading(false);
+        }
     };
 
     // OTP input handling

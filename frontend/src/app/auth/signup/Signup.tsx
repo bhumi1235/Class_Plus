@@ -6,13 +6,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
     GraduationCap, Eye, EyeOff, ArrowRight, Loader2, CheckCircle2,
-    Mail, Phone, Lock, User, MapPin, Globe, UserCircle2
+    Mail, Phone, Lock, User, MapPin, Globe, UserCircle2, Locate
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/store/useAuth";
+import { API_AUTH_BASE, AUTH_PATHS } from "@/lib/api";
 
-const API_BASE = "https://classplus-iwn1.onrender.com/api";
 const RESEND_DELAY = 30;
 
 type Step = "details" | "otp" | "success";
@@ -35,6 +35,10 @@ export default function SignupPage() {
     const [showPassword, setShowPassword] = useState(false);
     const [country, setCountry] = useState("India");
     const [address, setAddress] = useState("");
+    const [latitude, setLatitude] = useState<number>(0);
+    const [longitude, setLongitude] = useState<number>(0);
+    const [locationLoading, setLocationLoading] = useState(false);
+    const [locationError, setLocationError] = useState<string | null>(null);
 
     /* ── Parent fields ── */
     const [parentName, setParentName] = useState("");
@@ -78,7 +82,7 @@ export default function SignupPage() {
         setError("");
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/auth/register`, {
+            const res = await fetch(`${API_AUTH_BASE}${AUTH_PATHS.registerStudent}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -91,8 +95,8 @@ export default function SignupPage() {
                     parentEmail,
                     parentMobile,
                     address,
-                    latitude: 0,
-                    longitude: 0,
+                    latitude,
+                    longitude,
                     playerId: "",
                     deviceType: "web",
                 }),
@@ -114,7 +118,7 @@ export default function SignupPage() {
         if (resendCooldown > 0) return;
         setLoading(true);
         try {
-            await fetch(`${API_BASE}/auth/resend-otp`, {
+            await fetch(`${API_AUTH_BASE}${AUTH_PATHS.resendOtp}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ studentId }),
@@ -136,7 +140,7 @@ export default function SignupPage() {
         setError("");
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/auth/verifyotp`, {
+            const res = await fetch(`${API_AUTH_BASE}${AUTH_PATHS.verifyOtp}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ studentId, otp: code }),
@@ -163,6 +167,28 @@ export default function SignupPage() {
     };
     const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
         if (e.key === "Backspace" && !otp[index] && index > 0) otpRefs.current[index - 1]?.focus();
+    };
+
+    /* ── Get current location (latitude/longitude) ── */
+    const handleUseMyLocation = () => {
+        if (!navigator.geolocation) {
+            setLocationError("Location is not supported by your browser.");
+            return;
+        }
+        setLocationError(null);
+        setLocationLoading(true);
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                setLatitude(position.coords.latitude);
+                setLongitude(position.coords.longitude);
+                setLocationLoading(false);
+            },
+            (err) => {
+                setLocationError(err.message === "User denied Geolocation" ? "Location permission denied." : "Could not get location.");
+                setLocationLoading(false);
+            },
+            { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+        );
     };
 
     if (!mounted) return null;
@@ -272,7 +298,7 @@ export default function SignupPage() {
                                         </button>
                                     </div>
 
-                                    {/* Country + Address in a row */}
+                                    {/* Country + Address */}
                                     <div className="grid grid-cols-2 gap-3">
                                         <div className="relative">
                                             <Globe className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -290,6 +316,38 @@ export default function SignupPage() {
                                                 className="w-full pl-10 pr-3 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm text-gray-900 placeholder:text-gray-400"
                                             />
                                         </div>
+                                    </div>
+
+                                    {/* Latitude / Longitude — Use my location */}
+                                    <div className="space-y-1.5">
+                                        <div className="flex items-center gap-2 flex-wrap">
+                                            <button
+                                                type="button"
+                                                onClick={handleUseMyLocation}
+                                                disabled={locationLoading}
+                                                className={cn(
+                                                    "inline-flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-sm font-medium transition-all",
+                                                    latitude !== 0 || longitude !== 0
+                                                        ? "border-green-300 bg-green-50 text-green-800"
+                                                        : "border-gray-200 bg-gray-50 text-gray-700 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
+                                                )}
+                                            >
+                                                {locationLoading ? (
+                                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                                ) : (
+                                                    <Locate className="h-4 w-4" />
+                                                )}
+                                                {locationLoading ? "Getting location…" : "Use my location"}
+                                            </button>
+                                            {(latitude !== 0 || longitude !== 0) && (
+                                                <span className="text-xs text-gray-500">
+                                                    {latitude.toFixed(4)}°, {longitude.toFixed(4)}°
+                                                </span>
+                                            )}
+                                        </div>
+                                        {locationError && (
+                                            <p className="text-red-500 text-xs">{locationError}</p>
+                                        )}
                                     </div>
 
                                     {/* ── Parent Info ── */}

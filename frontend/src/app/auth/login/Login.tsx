@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 import { motion, LayoutGroup, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/store/useAuth";
+import { API_AUTH_BASE, AUTH_PATHS } from "@/lib/api";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -32,13 +33,33 @@ export default function LoginPage() {
         }
     }, [isAuthenticated, router]);
 
-    const handleLogin = (e: React.FormEvent) => {
+    const [error, setError] = useState("");
+
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!identifier.trim()) return setError("Please enter your email or mobile.");
+        if (!password.trim()) return setError("Please enter your password.");
+        setError("");
         setLoading(true);
-        login({ name: "User", email: identifier });
-        setTimeout(() => {
+        try {
+            const body: Record<string, string> = { password, role };
+            if (/^\d+$/.test(identifier)) body.mobile = identifier;
+            else body.email = identifier;
+            const res = await fetch(`${API_AUTH_BASE}${AUTH_PATHS.login}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body),
+            });
+            const data = await res.json();
+            if (!res.ok || !data.status) throw new Error(data.message || "Login failed.");
+            login({ name: data.user?.name || identifier.split("@")[0], email: data.user?.email || identifier });
+            if (data.token) localStorage.setItem("cp_token", data.token);
             router.push("/dashboard");
-        }, 1500);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : "Something went wrong.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const socialVariants = {
