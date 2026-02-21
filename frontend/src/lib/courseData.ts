@@ -1,5 +1,8 @@
 // Shared course definitions used across CoursesPage and CourseDetailsPage
 
+import { useState, useEffect, useCallback } from "react";
+import { COURSE_API_BASE, COURSE_PATHS } from "@/lib/api";
+
 export interface CourseItem {
     id: string;
     title: string;
@@ -165,14 +168,152 @@ export const COURSES: CourseItem[] = [
     },
 ];
 
-// Mock: IDs of courses the logged‑in student is enrolled in
-// In a real app this would come from the backend/auth context
-export const ENROLLED_COURSE_IDS: string[] = ["1", "2"];
+// Mock: IDs of courses the logged-in student is enrolled in (fallback when API not used).
+export const ENROLLED_COURSE_IDS: string[] = ["1"];
+
+// Cache populated by fetchCoursePageData — used by getCourseById / isEnrolledIn when set
+let coursesCache: CourseItem[] | null = null;
+let enrolledIdsCache: string[] | null = null;
+
+export function setCourseDataCache(courses: CourseItem[], enrolledIds: string[]) {
+    coursesCache = courses;
+    enrolledIdsCache = enrolledIds;
+}
+
+function getFirst<T>(obj: unknown, ...keys: string[]): T | undefined {
+    if (obj == null || typeof obj !== "object") return undefined;
+    const o = obj as Record<string, unknown>;
+    for (const k of keys) {
+        const v = o[k];
+        if (v !== undefined && v !== null) return v as T;
+    }
+    return undefined;
+}
+
+function mapApiCourseToItem(raw: unknown, index: number): CourseItem {
+    const o = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+    const id = String(getFirst<string>(o, "id", "courseId", "course_id") ?? index + 1);
+    const title = String(getFirst<string>(o, "title", "courseName", "name", "course_name") ?? "Course");
+    const description = String(getFirst<string>(o, "description", "desc") ?? "");
+    const thumbnail = String(getFirst<string>(o, "thumbnail", "image", "thumbnailUrl", "imageUrl", "thumbnail_url", "image_url") ?? "");
+    const instructor = String(getFirst<string>(o, "instructor", "teacherName", "instructorName", "teacher_name") ?? "");
+    const price = Number(getFirst<number>(o, "price", "sellingPrice", "selling_price")) || 0;
+    const originalPrice = Number(getFirst<number>(o, "originalPrice", "mrp", "actualPrice", "actual_price")) || price || 999;
+    const rating = Number(getFirst<number>(o, "rating", "avgRating", "avg_rating")) || 0;
+    const students = Number(getFirst<number>(o, "students", "enrolledCount", "enrolled_count")) || 0;
+    const duration = String(getFirst<string>(o, "duration", "courseDuration", "course_duration") ?? "");
+    const isLive = Boolean(getFirst<boolean>(o, "isLive", "is_live"));
+    const category = String(getFirst<string>(o, "category", "courseCategory", "course_category") ?? "");
+    const rawCurriculum = getFirst<unknown[]>(o, "curriculum", "chapters", "modules", "lessons", "syllabus");
+    const curriculum = Array.isArray(rawCurriculum)
+        ? rawCurriculum.slice(0, 20).map((item, i) => {
+            const r = (item && typeof item === "object" ? item : {}) as Record<string, unknown>;
+            return {
+                id: Number(getFirst<number>(r, "id", "lessonId", "lesson_id")) || i + 1,
+                title: String(getFirst<string>(r, "title", "name", "lessonName", "lesson_name") ?? "Lesson"),
+                duration: String(getFirst<string>(r, "duration", "durationMinutes", "duration_minutes") ?? ""),
+                type: (String(getFirst<string>(r, "type", "contentType", "content_type") ?? "video").toLowerCase().includes("sheet") || String(getFirst<string>(r, "type")).toLowerCase() === "worksheet" ? "worksheet" : "video") as "video" | "worksheet",
+                isCompleted: Boolean(getFirst<boolean>(r, "isCompleted", "is_completed", "completed")),
+                isLocked: Boolean(getFirst<boolean>(r, "isLocked", "is_locked", "locked")),
+            };
+        })
+        : [
+            { id: 1, title: "Introduction", duration: "", type: "video" as const, isCompleted: false, isLocked: false },
+        ];
+    return {
+        id,
+        title,
+        description,
+        thumbnail,
+        instructor,
+        price,
+        originalPrice,
+        rating,
+        students,
+        duration,
+        isLive,
+        category,
+        tabs: ["Curriculum", "Materials", "Announcements"],
+        curriculum,
+    };
+}
+
+/** Extract courses array and enrolled IDs from various backend response shapes */
+function mapApiResponseToCourseData(response: unknown): { courses: CourseItem[]; enrolledIds: string[] } {
+    const o = (response && typeof response === "object" ? response : {}) as Record<string, unknown>;
+    // Common shapes: { data: { courses, enrolledIds } }, { courses, enrolledCourseIds }, { result: [...] }, or array at top level
+    const data = getFirst<Record<string, unknown>>(o, "data", "result") ?? o;
+    const dataObj = (data && typeof data === "object" ? data : {}) as Record<string, unknown>;
+    let rawCourses = getFirst<unknown[]>(o, "courses") ?? getFirst<unknown[]>(dataObj, "courses", "courseList", "course_list", "list");
+    if (!rawCourses && Array.isArray(response)) rawCourses = response;
+    const courses = Array.isArray(rawCourses) ? rawCourses.map(mapApiCourseToItem) : [];
+    let enrolledIds: string[] = [];
+    const rawEnrolled = getFirst<unknown[]>(o, "enrolledCourseIds", "enrolledIds", "enrolled_ids") ?? getFirst<unknown[]>(dataObj, "enrolledCourseIds", "enrolledIds", "enrolled_ids");
+    if (Array.isArray(rawEnrolled)) enrolledIds = rawEnrolled.map((x) => String(x));
+    else if (Array.isArray(rawCourses)) {
+        // Backend might put isEnrolled on each course
+        rawCourses.forEach((c, i) => {
+            const r = (c && typeof c === "object" ? c : {}) as Record<string, unknown>;
+            if (getFirst<boolean>(r, "isEnrolled", "is_enrolled", "enrolled")) enrolledIds.push(String(getFirst<string>(r, "id", "courseId", "course_id") ?? i + 1));
+        });
+    }
+    return { courses, enrolledIds };
+}
+
+const DEFAULT_COURSE_USER_ID = "ramus2026013014365210";
+
+export async function fetchCoursePageData(userId?: string): Promise<{ courses: CourseItem[]; enrolledIds: string[] }> {
+    const id = userId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_COURSE_USER_ID : undefined) ?? DEFAULT_COURSE_USER_ID;
+    const url = `${COURSE_API_BASE}${COURSE_PATHS.coursePageData(id)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Course data failed: ${res.status}`);
+    const json: unknown = await res.json();
+    const { courses, enrolledIds } = mapApiResponseToCourseData(json);
+    setCourseDataCache(courses, enrolledIds);
+    return { courses, enrolledIds };
+}
+
+export function getCourses(): CourseItem[] {
+    return coursesCache ?? COURSES;
+}
 
 export function getCourseById(id: string): CourseItem | undefined {
-    return COURSES.find((c) => c.id === id);
+    return getCourses().find((c) => c.id === id);
+}
+
+export function getEnrolledCourseIds(): string[] {
+    return enrolledIdsCache ?? ENROLLED_COURSE_IDS;
 }
 
 export function isEnrolledIn(courseId: string): boolean {
-    return ENROLLED_COURSE_IDS.includes(courseId);
+    return getEnrolledCourseIds().includes(courseId);
+}
+
+export function useCoursePageData(userId?: string) {
+    const [courses, setCourses] = useState<CourseItem[]>(() => coursesCache ?? COURSES);
+    const [enrolledIds, setEnrolledIds] = useState<string[]>(() => enrolledIdsCache ?? ENROLLED_COURSE_IDS);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    const refetch = useCallback(async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const { courses: nextCourses, enrolledIds: nextEnrolledIds } = await fetchCoursePageData(userId);
+            setCourses(nextCourses);
+            setEnrolledIds(nextEnrolledIds);
+        } catch (e) {
+            setError(e instanceof Error ? e.message : "Failed to load courses");
+            setCourses(COURSES);
+            setEnrolledIds(ENROLLED_COURSE_IDS);
+        } finally {
+            setLoading(false);
+        }
+    }, [userId]);
+
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
+
+    return { courses, enrolledIds, loading, error, refetch };
 }

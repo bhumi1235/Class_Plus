@@ -19,3 +19,13 @@ export const FORGOT_PASSWORD_PATHS = {
     verifyForgotPasswordOtp: "/auth/verify-forgot-password-otp",
     resetPassword: "/auth/reset-password",
 } as const;
+
+/** Course data backend (e.g. http://51.20.53.47:5000) — use env NEXT_PUBLIC_COURSE_API_BASE to override */
+export const COURSE_API_BASE =
+    (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_COURSE_API_BASE) ||
+    "http://51.20.53.47:5000";
+
+export const COURSE_PATHS = {
+    /** GET course page data for a user/batch: /api/android/coursepagedata/:userId */
+    coursePageData: (userId: string) => `/api/android/coursepagedata/${userId}`,
+} as const;

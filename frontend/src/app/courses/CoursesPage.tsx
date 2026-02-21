@@ -6,10 +6,10 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import CourseCard from "@/components/CourseCard";
 import { Button } from "@/components/ui/Button";
-import { Search, BookOpen, Layers, Sparkles } from "lucide-react";
+import { Search, BookOpen, Layers, Sparkles, Loader2, AlertCircle } from "lucide-react";
 import { useAuth } from "@/store/useAuth";
 import { useAuthModal } from "@/store/useAuthModal";
-import { COURSES, ENROLLED_COURSE_IDS } from "@/lib/courseData";
+import { useCoursePageData } from "@/lib/courseData";
 
 const CATEGORIES = ["All", "JEE", "NEET", "UPSC", "GATE", "Coding", "MBA"];
 
@@ -32,14 +32,15 @@ export default function CoursesPage() {
         }
     }, [isAuthenticated, router, openLogin]);
 
+    const { courses, enrolledIds, loading, error, refetch } = useCoursePageData();
+
     if (!isAuthenticated) {
         return null;
     }
 
     // My Courses: only enrolled ones
-    const myCourses = COURSES.filter(c => ENROLLED_COURSE_IDS.includes(c.id));
-
-    const displayCourses = activeTab === "all" ? COURSES : myCourses;
+    const myCourses = courses.filter(c => enrolledIds.includes(c.id));
+    const displayCourses = activeTab === "all" ? courses : myCourses;
 
     const filteredCourses = displayCourses.filter(course => {
         const matchesCategory = activeCategory === "All" || course.category === activeCategory;
@@ -127,13 +128,25 @@ export default function CoursesPage() {
 
                 {/* Course Grid */}
                 <div className="min-h-[400px]">
-                    {filteredCourses.length > 0 ? (
+                    {loading ? (
+                        <div className="flex flex-col items-center justify-center py-24">
+                            <Loader2 className="h-12 w-12 animate-spin text-indigo-500 mb-4" />
+                            <p className="text-gray-500">Loading courses…</p>
+                        </div>
+                    ) : error ? (
+                        <div className="text-center py-24">
+                            <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Could not load courses</h3>
+                            <p className="text-gray-500 mb-4">{error}</p>
+                            <Button onClick={() => refetch()}>Try again</Button>
+                        </div>
+                    ) : filteredCourses.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             {filteredCourses.map(course => (
                                 <CourseCard
                                     key={course.id}
                                     course={course}
-                                    isEnrolled={activeTab === 'my'}
+                                    isEnrolled={enrolledIds.includes(course.id)}
                                     href={`/courses/${course.id}`}
                                 />
                             ))}

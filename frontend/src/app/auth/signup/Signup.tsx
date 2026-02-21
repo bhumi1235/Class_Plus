@@ -15,6 +15,19 @@ import { API_AUTH_BASE, AUTH_PATHS } from "@/lib/api";
 
 const RESEND_DELAY = 30;
 
+/* Geofence: India bounding box (approx). Adjust or make configurable if needed. */
+const GEOFENCE = {
+    minLat: 8.0,
+    maxLat: 35.5,
+    minLon: 68.0,
+    maxLon: 97.5,
+};
+
+function isWithinGeofence(lat: number, lon: number): boolean {
+    if (lat === 0 && lon === 0) return false;
+    return lat >= GEOFENCE.minLat && lat <= GEOFENCE.maxLat && lon >= GEOFENCE.minLon && lon <= GEOFENCE.maxLon;
+}
+
 type Step = "details" | "otp" | "success";
 
 export default function SignupPage() {
@@ -79,6 +92,15 @@ export default function SignupPage() {
         if (!email.trim()) return setError("Please enter your email.");
         if (!mobile.trim() || mobile.length < 10) return setError("Please enter a valid 10-digit mobile number.");
         if (password.length < 6) return setError("Password must be at least 6 characters.");
+        /* Geofencing: require location and that it's within allowed region */
+        if (latitude === 0 && longitude === 0) {
+            setError("Please use \"Use my location\" to verify your location. Signup requires your location.");
+            return;
+        }
+        if (!isWithinGeofence(latitude, longitude)) {
+            setError("Signup is only available in the allowed region. Your location is outside the service area.");
+            return;
+        }
         setError("");
         setLoading(true);
         try {
@@ -181,13 +203,20 @@ export default function SignupPage() {
             (position) => {
                 setLatitude(position.coords.latitude);
                 setLongitude(position.coords.longitude);
+                setLocationError(null);
                 setLocationLoading(false);
             },
             (err) => {
-                setLocationError(err.message === "User denied Geolocation" ? "Location permission denied." : "Could not get location.");
+                const msg =
+                    err.code === 1
+                        ? "Location permission denied. Please allow location access to sign up."
+                        : err.code === 2
+                            ? "Location unavailable. Check your device location and try again."
+                            : "Could not get location. Use HTTPS and allow location access.";
+                setLocationError(msg);
                 setLocationLoading(false);
             },
-            { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+            { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
         );
     };
 
@@ -318,15 +347,16 @@ export default function SignupPage() {
                                         </div>
                                     </div>
 
-                                    {/* Latitude / Longitude — Use my location */}
+                                    {/* Geofencing: Latitude / Longitude — required for signup */}
                                     <div className="space-y-1.5">
+                                        <p className="text-xs font-medium text-gray-600">Location (required for signup)</p>
                                         <div className="flex items-center gap-2 flex-wrap">
                                             <button
                                                 type="button"
                                                 onClick={handleUseMyLocation}
                                                 disabled={locationLoading}
                                                 className={cn(
-                                                    "inline-flex items-center gap-2 px-3 py-2 rounded-xl border-2 text-sm font-medium transition-all",
+                                                    "inline-flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 text-sm font-medium transition-all",
                                                     latitude !== 0 || longitude !== 0
                                                         ? "border-green-300 bg-green-50 text-green-800"
                                                         : "border-gray-200 bg-gray-50 text-gray-700 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700"
@@ -342,11 +372,17 @@ export default function SignupPage() {
                                             {(latitude !== 0 || longitude !== 0) && (
                                                 <span className="text-xs text-gray-500">
                                                     {latitude.toFixed(4)}°, {longitude.toFixed(4)}°
+                                                    {isWithinGeofence(latitude, longitude) && (
+                                                        <span className="ml-1 text-green-600">✓ In region</span>
+                                                    )}
                                                 </span>
                                             )}
                                         </div>
                                         {locationError && (
                                             <p className="text-red-500 text-xs">{locationError}</p>
+                                        )}
+                                        {(latitude !== 0 || longitude !== 0) && !isWithinGeofence(latitude, longitude) && (
+                                            <p className="text-amber-600 text-xs">Your location is outside the allowed signup region.</p>
                                         )}
                                     </div>
 

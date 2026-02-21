@@ -4,12 +4,12 @@ import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
     PlayCircle, FileText, Clock, Star, Users,
-    ChevronRight, Lock, CheckCircle, MessageCircle, AlertCircle
+    ChevronRight, Lock, CheckCircle, MessageCircle, AlertCircle, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { cn } from "@/lib/utils";
 import { EnrollmentModal } from "@/components/courses/EnrollmentModal";
-import { getCourseById, isEnrolledIn } from "@/lib/courseData";
+import { getCourseById, isEnrolledIn, useCoursePageData } from "@/lib/courseData";
 
 export default function CourseDetailsPage() {
     const params = useParams();
@@ -19,8 +19,20 @@ export default function CourseDetailsPage() {
     const [activeTab, setActiveTab] = useState("Curriculum");
     const [isEnrollmentOpen, setIsEnrollmentOpen] = useState(false);
 
+    const { loading } = useCoursePageData();
     const course = getCourseById(courseId);
     const isEnrolled = isEnrolledIn(courseId);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="text-center">
+                    <Loader2 className="h-12 w-12 animate-spin text-indigo-500 mx-auto mb-4" />
+                    <p className="text-gray-500">Loading course…</p>
+                </div>
+            </div>
+        );
+    }
 
     if (!course) {
         return (
@@ -48,10 +60,19 @@ export default function CourseDetailsPage() {
                         <ChevronRight className="h-6 w-6 rotate-180" />
                     </Button>
                     <h1 className="text-lg font-bold truncate flex-1">{course.title}</h1>
-                    {isEnrolled && (
+                    {isEnrolled ? (
                         <span className="shrink-0 text-xs font-bold bg-green-100 text-green-700 border border-green-200 px-3 py-1.5 rounded-full">
                             ✓ Enrolled
                         </span>
+                    ) : (
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setIsEnrollmentOpen(true)}
+                            className="shrink-0 text-xs font-bold border-indigo-300 text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-full"
+                        >
+                            Enroll
+                        </Button>
                     )}
                 </div>
             </header>
@@ -216,7 +237,7 @@ export default function CourseDetailsPage() {
                                 onClick={() => setIsEnrollmentOpen(true)}
                                 className="flex-[2] h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl shadow-indigo-200 text-lg font-bold"
                             >
-                                Enroll Now
+                                Enroll
                             </Button>
                         </>
                     )}
