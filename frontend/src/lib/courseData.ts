@@ -194,10 +194,10 @@ function mapApiCourseToItem(raw: unknown, index: number): CourseItem {
     const o = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
     const id = String(getFirst<string>(o, "id", "courseId", "course_id") ?? index + 1);
     const title = String(getFirst<string>(o, "title", "courseName", "name", "course_name") ?? "Course");
-    const description = String(getFirst<string>(o, "description", "desc") ?? "");
+    const description = String(getFirst<string>(o, "description", "courseDescription", "desc") ?? "");
     const thumbnail = String(getFirst<string>(o, "thumbnail", "image", "thumbnailUrl", "imageUrl", "thumbnail_url", "image_url") ?? "");
     const instructor = String(getFirst<string>(o, "instructor", "teacherName", "instructorName", "teacher_name") ?? "");
-    const price = Number(getFirst<number>(o, "price", "sellingPrice", "selling_price")) || 0;
+    const price = Number(getFirst<number>(o, "price", "discountedprice", "sellingPrice", "selling_price")) || 0;
     const originalPrice = Number(getFirst<number>(o, "originalPrice", "mrp", "actualPrice", "actual_price")) || price || 999;
     const rating = Number(getFirst<number>(o, "rating", "avgRating", "avg_rating")) || 0;
     const students = Number(getFirst<number>(o, "students", "enrolledCount", "enrolled_count")) || 0;
@@ -244,7 +244,7 @@ function mapApiResponseToCourseData(response: unknown): { courses: CourseItem[];
     // Common shapes: { data: { courses, enrolledIds } }, { courses, enrolledCourseIds }, { result: [...] }, or array at top level
     const data = getFirst<Record<string, unknown>>(o, "data", "result") ?? o;
     const dataObj = (data && typeof data === "object" ? data : {}) as Record<string, unknown>;
-    let rawCourses = getFirst<unknown[]>(o, "courses") ?? getFirst<unknown[]>(dataObj, "courses", "courseList", "course_list", "list");
+    let rawCourses = getFirst<unknown[]>(o, "courses") ?? getFirst<unknown[]>(dataObj, "allCourses", "courses", "courseList", "course_list", "list");
     if (!rawCourses && Array.isArray(response)) rawCourses = response;
     const courses = Array.isArray(rawCourses) ? rawCourses.map(mapApiCourseToItem) : [];
     let enrolledIds: string[] = [];
@@ -262,9 +262,17 @@ function mapApiResponseToCourseData(response: unknown): { courses: CourseItem[];
 
 const DEFAULT_COURSE_USER_ID = "ramus2026013014365210";
 
+/** In the browser we use our own API proxy to avoid mixed content (HTTPS page → HTTP API). */
+function getCoursePageDataUrl(userId: string): string {
+    if (typeof window !== "undefined") {
+        return `/api/coursepagedata/${encodeURIComponent(userId)}`;
+    }
+    return `${COURSE_API_BASE}${COURSE_PATHS.coursePageData(userId)}`;
+}
+
 export async function fetchCoursePageData(userId?: string): Promise<{ courses: CourseItem[]; enrolledIds: string[] }> {
     const id = userId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_COURSE_USER_ID : undefined) ?? DEFAULT_COURSE_USER_ID;
-    const url = `${COURSE_API_BASE}${COURSE_PATHS.coursePageData(id)}`;
+    const url = getCoursePageDataUrl(id);
     const res = await fetch(url);
     if (!res.ok) throw new Error(`Course data failed: ${res.status}`);
     const json: unknown = await res.json();

@@ -1,6 +1,5 @@
 /**
- * Backend base URL — all API calls use this base.
- * Override with NEXT_PUBLIC_API_BASE if needed.
+ * Backend base URL for auth and most APIs (includes /api).
  */
 const API_BASE =
     (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_BASE) ||
@@ -8,7 +7,11 @@ const API_BASE =
 
 export const API_AUTH_BASE = API_BASE;
 export const API_FORGOT_PASSWORD_BASE = API_BASE;
-export const COURSE_API_BASE = API_BASE;
+
+/** Course page data uses path android/coursepagedata/:userId (no /api prefix). */
+export const COURSE_API_BASE =
+    (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_COURSE_API_BASE) ||
+    "http://51.20.53.47:5000";
 
 export const AUTH_PATHS = {
     login: "/auth/login",
@@ -24,6 +27,6 @@ export const FORGOT_PASSWORD_PATHS = {
 } as const;
 
 export const COURSE_PATHS = {
-    /** GET course page data for a user/batch: /android/coursepagedata/:userId */
+    /** GET course page data: android/coursepagedata/:userId */
     coursePageData: (userId: string) => `/android/coursepagedata/${userId}`,
 } as const;

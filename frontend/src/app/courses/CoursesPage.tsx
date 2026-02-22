@@ -126,6 +126,14 @@ export default function CoursesPage() {
                     </div>
                 )}
 
+                {/* Error banner when API failed but we have fallback courses */}
+                {error && courses.length > 0 && (
+                    <div className="mb-6 flex items-center justify-between gap-4 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3">
+                        <p className="text-sm text-amber-800">Couldn&apos;t reach server. Showing sample courses.</p>
+                        <Button variant="outline" size="sm" onClick={() => refetch()}>Try again</Button>
+                    </div>
+                )}
+
                 {/* Course Grid */}
                 <div className="min-h-[400px]">
                     {loading ? (
@@ -133,7 +141,7 @@ export default function CoursesPage() {
                             <Loader2 className="h-12 w-12 animate-spin text-indigo-500 mb-4" />
                             <p className="text-gray-500">Loading courses…</p>
                         </div>
-                    ) : error ? (
+                    ) : error && courses.length === 0 ? (
                         <div className="text-center py-24">
                             <AlertCircle className="h-12 w-12 text-amber-500 mx-auto mb-4" />
                             <h3 className="text-xl font-bold text-gray-900 mb-2">Could not load courses</h3>
