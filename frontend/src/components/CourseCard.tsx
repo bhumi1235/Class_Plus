@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Clock, Users, Star, ArrowRight, BookOpen, PlayCircle } from "lucide-react";
+import { Clock, Users, Star, ArrowRight, BookOpen, PlayCircle, Layers } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,13 @@ export interface Course {
   reviews?: { user: string; rating: number; comment: string }[];
   features?: string[];
   category?: string;
+  courseType?: string;
+  board?: string;
+  classname?: string;
+  subject?: string;
+  medium?: string;
+  totalLessons?: number;
+  difficulty?: string;
 }
 
 interface CourseCardProps {
@@ -130,12 +137,53 @@ export default function CourseCard({
             <div className="mt-2 flex items-center gap-4 text-xs font-medium text-gray-500">
               <div className="flex items-center gap-1">
                 <BookOpen className="h-3.5 w-3.5" />
-                <span>{course.instructor}</span>
+                <span>{course.instructor || "Expert Instructor"}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5" />
-                <span>{course.duration}</span>
+                <span>{course.duration ? `${course.duration} mins` : "Self-paced"}</span>
               </div>
+            </div>
+
+            {/* Academic Info */}
+            {(course.board || course.classname || course.subject || course.medium) && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {course.board && (
+                  <span className="px-2 py-0.5 rounded bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider">
+                    {course.board}
+                  </span>
+                )}
+                {course.classname && (
+                  <span className="px-2 py-0.5 rounded bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-wider">
+                    Class {course.classname}
+                  </span>
+                )}
+                {course.subject && (
+                  <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-600 text-[10px] font-bold uppercase tracking-wider">
+                    {course.subject}
+                  </span>
+                )}
+                {course.medium && (
+                  <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-wider">
+                    {course.medium}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* metadata footer */}
+            <div className="mt-2 flex items-center justify-between">
+              {course.totalLessons !== undefined && course.totalLessons > 0 && (
+                <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest flex items-center gap-1">
+                  <Layers className="h-3 w-3" />
+                  {course.totalLessons} Lessons
+                </p>
+              )}
+              {course.difficulty && (
+                <p className="text-[10px] font-semibold text-indigo-400 uppercase tracking-widest">
+                  {course.difficulty}
+                </p>
+              )}
             </div>
 
             <div className="mt-auto pt-4 border-t border-gray-100 mt-4">

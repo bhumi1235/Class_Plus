@@ -12,7 +12,7 @@ export async function GET(
     if (!userId) {
         return NextResponse.json({ error: "Missing userId" }, { status: 400 });
     }
-    const url = `${COURSE_BACKEND_BASE}/android/coursepagedata/${userId}`;
+    const url = `${COURSE_BACKEND_BASE}/api/android/coursepagedata/${userId}`;
     try {
         const res = await fetch(url, {
             headers: { Accept: "application/json" },

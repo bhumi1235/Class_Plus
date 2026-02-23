@@ -18,6 +18,13 @@ export interface CourseItem {
     level?: string;
     daysLeft?: number;
     category: string;
+    courseType?: string;
+    board?: string;
+    classname?: string;
+    subject?: string;
+    medium?: string;
+    totalLessons?: number;
+    difficulty?: string;
     tabs: string[];
     curriculum: {
         id: number;
@@ -192,7 +199,7 @@ function getFirst<T>(obj: unknown, ...keys: string[]): T | undefined {
 
 function mapApiCourseToItem(raw: unknown, index: number): CourseItem {
     const o = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
-    const id = String(getFirst<string>(o, "id", "courseId", "course_id") ?? index + 1);
+    const id = String(getFirst<string>(o, "courseCode", "id", "courseId", "course_id") ?? index + 1);
     const title = String(getFirst<string>(o, "title", "courseName", "name", "course_name") ?? "Course");
     const description = String(getFirst<string>(o, "description", "courseDescription", "desc") ?? "");
     let thumbnail = String(getFirst<string>(o, "thumbnail", "image", "thumbnailUrl", "imageUrl", "thumbnail_url", "image_url") ?? "");
@@ -207,6 +214,13 @@ function mapApiCourseToItem(raw: unknown, index: number): CourseItem {
     const duration = String(getFirst<string>(o, "duration", "courseDuration", "course_duration") ?? "");
     const isLive = Boolean(getFirst<boolean>(o, "isLive", "is_live"));
     const category = String(getFirst<string>(o, "category", "courseCategory", "course_category") ?? "");
+    const courseType = String(getFirst<string>(o, "courseType", "course_type") ?? "");
+    const board = String(getFirst<string>(o, "board") ?? "");
+    const classname = String(getFirst<string>(o, "classname", "class_name") ?? "");
+    const subject = String(getFirst<string>(o, "subject") ?? "");
+    const medium = String(getFirst<string>(o, "medium") ?? "");
+    const totalLessons = Number(getFirst<number>(o, "totalLessons", "total_lessons")) || 0;
+    const difficulty = String(getFirst<string>(o, "difficulty", "courseDifficulty") ?? "");
     const rawCurriculum = getFirst<unknown[]>(o, "curriculum", "chapters", "modules", "lessons", "syllabus");
     const curriculum = Array.isArray(rawCurriculum)
         ? rawCurriculum.slice(0, 20).map((item, i) => {
@@ -236,6 +250,13 @@ function mapApiCourseToItem(raw: unknown, index: number): CourseItem {
         duration,
         isLive,
         category,
+        courseType,
+        board,
+        classname,
+        subject,
+        medium,
+        totalLessons,
+        difficulty,
         tabs: ["Curriculum", "Materials", "Announcements"],
         curriculum,
     };
@@ -268,7 +289,7 @@ const DEFAULT_COURSE_USER_ID = "ramus2026013014365210";
 /** In the browser we use our own API proxy to avoid mixed content (HTTPS page → HTTP API). */
 function getCoursePageDataUrl(userId: string): string {
     if (typeof window !== "undefined") {
-        return `/api/coursepagedata/${encodeURIComponent(userId)}`;
+        return `/api/proxy/api/android/coursepagedata/${encodeURIComponent(userId)}`;
     }
     return `${COURSE_API_BASE}${COURSE_PATHS.coursePageData(userId)}`;
 }
