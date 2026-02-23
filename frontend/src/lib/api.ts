@@ -31,6 +31,6 @@ export const FORGOT_PASSWORD_PATHS = {
 } as const;
 
 export const COURSE_PATHS = {
-    /** GET course page data: android/coursepagedata/:userId */
-    coursePageData: (userId: string) => `/android/coursepagedata/${userId}`,
+    /** GET course page data: /api/android/coursepagedata/:userId */
+    coursePageData: (userId: string) => `/api/android/coursepagedata/${userId}`,
 } as const;

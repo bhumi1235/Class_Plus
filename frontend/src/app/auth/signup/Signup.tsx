@@ -182,7 +182,8 @@ export default function SignupPage() {
 
             login({
                 name: data.user?.name || name,
-                email: data.user?.email || email
+                email: data.user?.email || email,
+                studentId: data.user?.studentId || studentId || ""
             });
 
             setStep("success");

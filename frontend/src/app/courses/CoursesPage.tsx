@@ -14,7 +14,7 @@ import { useCoursePageData } from "@/lib/courseData";
 const CATEGORIES = ["All", "JEE", "NEET", "UPSC", "GATE", "Coding", "MBA"];
 
 export default function CoursesPage() {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const { openLogin } = useAuthModal();
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<"all" | "my">("all");
@@ -32,7 +32,12 @@ export default function CoursesPage() {
         }
     }, [isAuthenticated, router, openLogin]);
 
-    const { courses, enrolledIds, loading, error, refetch } = useCoursePageData();
+    const { courses, enrolledIds, loading, error, refetch } = useCoursePageData(user?.studentId);
+
+    // Manual refetch on ID change
+    useEffect(() => {
+        if (user?.studentId) refetch();
+    }, [user?.studentId, refetch]);
 
     if (!isAuthenticated) {
         return null;

@@ -195,7 +195,10 @@ function mapApiCourseToItem(raw: unknown, index: number): CourseItem {
     const id = String(getFirst<string>(o, "id", "courseId", "course_id") ?? index + 1);
     const title = String(getFirst<string>(o, "title", "courseName", "name", "course_name") ?? "Course");
     const description = String(getFirst<string>(o, "description", "courseDescription", "desc") ?? "");
-    const thumbnail = String(getFirst<string>(o, "thumbnail", "image", "thumbnailUrl", "imageUrl", "thumbnail_url", "image_url") ?? "");
+    let thumbnail = String(getFirst<string>(o, "thumbnail", "image", "thumbnailUrl", "imageUrl", "thumbnail_url", "image_url") ?? "");
+    if (thumbnail.startsWith("/")) {
+        thumbnail = `http://13.60.13.116:5000${thumbnail}`;
+    }
     const instructor = String(getFirst<string>(o, "instructor", "teacherName", "instructorName", "teacher_name") ?? "");
     const price = Number(getFirst<number>(o, "price", "discountedprice", "sellingPrice", "selling_price")) || 0;
     const originalPrice = Number(getFirst<number>(o, "originalPrice", "mrp", "actualPrice", "actual_price")) || price || 999;
@@ -273,7 +276,16 @@ function getCoursePageDataUrl(userId: string): string {
 export async function fetchCoursePageData(userId?: string): Promise<{ courses: CourseItem[]; enrolledIds: string[] }> {
     const id = userId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_COURSE_USER_ID : undefined) ?? DEFAULT_COURSE_USER_ID;
     const url = getCoursePageDataUrl(id);
-    const res = await fetch(url);
+
+    const token = typeof window !== "undefined" ? localStorage.getItem("cp_token") : null;
+    const headers: Record<string, string> = {
+        "Accept": "application/json"
+    };
+    if (token) {
+        headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    const res = await fetch(url, { headers });
     if (!res.ok) throw new Error(`Course data failed: ${res.status}`);
     const json: unknown = await res.json();
     const { courses, enrolledIds } = mapApiResponseToCourseData(json);
