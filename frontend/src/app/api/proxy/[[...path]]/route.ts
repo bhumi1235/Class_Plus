@@ -16,13 +16,19 @@ async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path?: s
     const searchParams = req.nextUrl.searchParams.toString();
     const url = `${BACKEND_URL}/${fullPath}${searchParams ? '?' + searchParams : ''}`;
 
+    // Add a 30 second timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     try {
         let body;
         if (req.method === "POST") {
             try {
-                body = await req.json();
+                // Read body as text first to handle potential empty or non-JSON bodies safely
+                const text = await req.text();
+                body = text ? text : undefined;
             } catch (e) {
-                // No body or invalid json
+                // No body or invalid
             }
         }
 
@@ -30,17 +36,22 @@ async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path?: s
             method: req.method,
             headers: {
                 "Content-Type": "application/json",
-                // Pass through auth headers if present in the future
                 ...(req.headers.get("Authorization") ? { "Authorization": req.headers.get("Authorization")! } : {}),
             },
-            body: body ? JSON.stringify(body) : undefined,
+            body: body,
+            signal: controller.signal,
         });
 
-        const data = await res.json().catch(() => ({}));
+        clearTimeout(timeoutId);
 
-        // Return response with original status but as JSON
+        const data = await res.json().catch(() => ({}));
         return NextResponse.json(data, { status: res.status });
-    } catch (err) {
+    } catch (err: any) {
+        clearTimeout(timeoutId);
+        if (err.name === 'AbortError') {
+            console.error("[Proxy Timeout]:", url);
+            return NextResponse.json({ success: false, message: "Backend response timeout" }, { status: 504 });
+        }
         console.error("[Proxy Error]:", err);
         return NextResponse.json({ success: false, message: "Backend unreachable via proxy" }, { status: 502 });
     }

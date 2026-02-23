@@ -124,7 +124,7 @@ export default function SignupPage() {
                 }),
             });
             const data = await res.json();
-            if (!res.ok || !data.status) throw new Error(data.message || "Registration failed.");
+            if (!res.ok || (!data.status && !data.success)) throw new Error(data.message || "Registration failed.");
             setStudentId(data.studentId || "");
             setStep("otp");
             startResendTimer();
@@ -168,8 +168,22 @@ export default function SignupPage() {
                 body: JSON.stringify({ studentId, otp: code }),
             });
             const data = await res.json();
-            if (!res.ok || !data.status) throw new Error(data.message || "Invalid OTP.");
-            login({ name, email });
+
+            // Check for status or success flag for robustness
+            if (!res.ok || (!data.status && !data.success)) {
+                throw new Error(data.message || "Invalid OTP.");
+            }
+
+            // CRITICAL: Save the token if provided
+            if (data.token) {
+                localStorage.setItem("cp_token", data.token);
+            }
+
+            login({
+                name: data.user?.name || name,
+                email: data.user?.email || email
+            });
+
             setStep("success");
             setTimeout(() => router.push("/dashboard"), 1500);
         } catch (err: unknown) {

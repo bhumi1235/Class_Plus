@@ -51,7 +51,7 @@ export default function LoginPage() {
                 body: JSON.stringify(body),
             });
             const data = await res.json();
-            if (!res.ok || !data.status) throw new Error(data.message || "Login failed.");
+            if (!res.ok || (!data.status && !data.success)) throw new Error(data.message || "Login failed.");
             login({ name: data.user?.name || identifier.split("@")[0], email: data.user?.email || identifier });
             if (data.token) localStorage.setItem("cp_token", data.token);
             router.push("/dashboard");

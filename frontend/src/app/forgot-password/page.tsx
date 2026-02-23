@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
                 body: JSON.stringify(body),
             });
             const data = await res.json();
-            if (!res.ok || !data.status) throw new Error(data.message || "Could not send OTP.");
+            if (!res.ok || (!data.status && !data.success)) throw new Error(data.message || "Could not send OTP.");
             setLoading(false);
             setStep("otp");
             startResendTimer();
@@ -108,7 +108,7 @@ export default function ForgotPasswordPage() {
                 body: JSON.stringify(body),
             });
             const data = await res.json();
-            if (!res.ok || !data.status) throw new Error(data.message || "Invalid OTP.");
+            if (!res.ok || (!data.status && !data.success)) throw new Error(data.message || "Invalid OTP.");
             setLoading(false);
             setStep("reset");
         } catch (err: unknown) {
@@ -133,7 +133,7 @@ export default function ForgotPasswordPage() {
                 body: JSON.stringify(body),
             });
             const data = await res.json();
-            if (!res.ok || !data.status) throw new Error(data.message || "Reset failed.");
+            if (!res.ok || (!data.status && !data.success)) throw new Error(data.message || "Reset failed.");
             setLoading(false);
             setStep("success");
         } catch (err: unknown) {
