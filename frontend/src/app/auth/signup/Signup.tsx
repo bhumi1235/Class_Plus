@@ -401,37 +401,6 @@ export default function SignupPage() {
                                         )}
                                     </div>
 
-                                    {/* ── Parent Info ── */}
-                                    <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest pt-2">Parent / Guardian Details</p>
-
-                                    <div className="relative">
-                                        <UserCircle2 className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                        <input
-                                            type="text" placeholder="Parent Full Name"
-                                            value={parentName} onChange={e => setParentName(e.target.value)}
-                                            className="w-full pl-11 pr-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm text-gray-900 placeholder:text-gray-400"
-                                        />
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="relative">
-                                            <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                            <input
-                                                type="email" placeholder="Parent Email"
-                                                value={parentEmail} onChange={e => setParentEmail(e.target.value)}
-                                                className="w-full pl-10 pr-3 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm text-gray-900 placeholder:text-gray-400"
-                                            />
-                                        </div>
-                                        <div className="relative">
-                                            <Phone className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-                                            <input
-                                                type="tel" placeholder="Parent Mobile"
-                                                value={parentMobile} onChange={e => setParentMobile(e.target.value.replace(/\D/, ""))}
-                                                maxLength={10}
-                                                className="w-full pl-10 pr-3 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 outline-none transition-all text-sm text-gray-900 placeholder:text-gray-400"
-                                            />
-                                        </div>
-                                    </div>
 
                                     {error && <p className="text-red-500 text-sm">{error}</p>}
 
