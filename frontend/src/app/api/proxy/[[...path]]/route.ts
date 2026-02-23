@@ -21,35 +21,39 @@ async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path?: s
     const timeoutId = setTimeout(() => controller.abort(), 30000);
 
     try {
-        let body;
-        if (req.method === "POST") {
-            try {
-                // Read body as text first to handle potential empty or non-JSON bodies safely
-                const text = await req.text();
-                body = text ? text : undefined;
-            } catch (e) {
-                // No body or invalid
+        const body = req.method !== "GET" ? await req.text() : undefined;
+
+        // Forward ALL headers except 'host' to avoid ssl/routing errors
+        const headers = new Headers();
+        req.headers.forEach((value, key) => {
+            if (key.toLowerCase() !== "host") {
+                headers.set(key, value);
             }
-        }
+        });
 
         const res = await fetch(url, {
             method: req.method,
-            headers: {
-                "Content-Type": "application/json",
-                ...(req.headers.get("Authorization") ? { "Authorization": req.headers.get("Authorization")! } : {}),
-            },
+            headers: headers,
             body: body,
             signal: controller.signal,
         });
 
         clearTimeout(timeoutId);
 
-        const data = await res.json().catch(() => ({}));
-        return NextResponse.json(data, { status: res.status });
+        // Try to parse as JSON, if fails return text
+        const text = await res.text();
+        try {
+            const data = JSON.parse(text);
+            return NextResponse.json(data, { status: res.status });
+        } catch (e) {
+            return new NextResponse(text, {
+                status: res.status,
+                headers: { "Content-Type": res.headers.get("Content-Type") || "text/plain" }
+            });
+        }
     } catch (err: any) {
         clearTimeout(timeoutId);
         if (err.name === 'AbortError') {
-            console.error("[Proxy Timeout]:", url);
             return NextResponse.json({ success: false, message: "Backend response timeout" }, { status: 504 });
         }
         console.error("[Proxy Error]:", err);

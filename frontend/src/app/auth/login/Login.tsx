@@ -373,18 +373,19 @@ export default function LoginPage() {
                         </motion.button>
                     </motion.div>
 
-                    {/* Footer */}
-                    <motion.p
-                        className="mt-8 text-center text-sm text-gray-600"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 1.2 }}
-                    >
-                        Don't have an account?{" "}
-                        <Link href="/auth/signup" className="font-bold text-indigo-600 hover:text-indigo-700 transition-colors underline decoration-2 underline-offset-2">
-                            Sign up free
-                        </Link>
-                    </motion.p>
+                    {role === "student" && (
+                        <motion.p
+                            className="mt-8 text-center text-sm text-gray-600"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 1.2 }}
+                        >
+                            Don't have an account?{" "}
+                            <Link href="/auth/signup" className="font-bold text-indigo-600 hover:text-indigo-700 transition-colors underline decoration-2 underline-offset-2">
+                                Sign up free
+                            </Link>
+                        </motion.p>
+                    )}
                 </motion.div>
 
                 {/* Trust Badge */}

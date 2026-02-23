@@ -121,6 +121,7 @@ export default function SignupPage() {
                     longitude,
                     playerId: "",
                     deviceType: "web",
+                    role: "student",
                 }),
             });
             const data = await res.json();
@@ -165,7 +166,7 @@ export default function SignupPage() {
             const res = await fetch(`${API_AUTH_BASE}${AUTH_PATHS.verifyOtp}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ studentId, otp: code }),
+                body: JSON.stringify({ studentId, otp: code, role: "student" }),
             });
             const data = await res.json();
 
