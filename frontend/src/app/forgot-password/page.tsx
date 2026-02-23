@@ -54,9 +54,7 @@ export default function ForgotPasswordPage() {
         setError("");
         setLoading(true);
         try {
-            const body: Record<string, string> = {};
-            if (/^\d+$/.test(identifier)) body.mobile = identifier;
-            else body.email = identifier;
+            const body = { identifier };
             const res = await fetch(`${API_FORGOT_PASSWORD_BASE}${FORGOT_PASSWORD_PATHS.forgotPassword}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -77,9 +75,7 @@ export default function ForgotPasswordPage() {
         if (resendCooldown > 0) return;
         setLoading(true);
         try {
-            const body: Record<string, string> = {};
-            if (/^\d+$/.test(identifier)) body.mobile = identifier;
-            else body.email = identifier;
+            const body = { identifier };
             await fetch(`${API_FORGOT_PASSWORD_BASE}${FORGOT_PASSWORD_PATHS.forgotPassword}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -99,9 +95,7 @@ export default function ForgotPasswordPage() {
         setError("");
         setLoading(true);
         try {
-            const body: Record<string, string> = { otp: code };
-            if (/^\d+$/.test(identifier)) body.mobile = identifier;
-            else body.email = identifier;
+            const body = { identifier, otp: code };
             const res = await fetch(`${API_FORGOT_PASSWORD_BASE}${FORGOT_PASSWORD_PATHS.verifyForgotPasswordOtp}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -124,9 +118,7 @@ export default function ForgotPasswordPage() {
         setError("");
         setLoading(true);
         try {
-            const body: Record<string, string> = { newPassword };
-            if (/^\d+$/.test(identifier)) body.mobile = identifier;
-            else body.email = identifier;
+            const body = { identifier, newPassword };
             const res = await fetch(`${API_FORGOT_PASSWORD_BASE}${FORGOT_PASSWORD_PATHS.resetPassword}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

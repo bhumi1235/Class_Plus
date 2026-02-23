@@ -42,9 +42,7 @@ export default function LoginPage() {
         setError("");
         setLoading(true);
         try {
-            const body: Record<string, string> = { password, role };
-            if (/^\d+$/.test(identifier)) body.mobile = identifier;
-            else body.email = identifier;
+            const body = { identifier, password, role };
             const res = await fetch(`${API_AUTH_BASE}${AUTH_PATHS.login}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
