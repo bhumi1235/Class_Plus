@@ -53,10 +53,10 @@ export default function SignupPage() {
     const [locationLoading, setLocationLoading] = useState(false);
     const [locationError, setLocationError] = useState<string | null>(null);
 
-    /* ── Parent fields ── */
-    const [parentName, setParentName] = useState("");
-    const [parentEmail, setParentEmail] = useState("");
-    const [parentMobile, setParentMobile] = useState("");
+    /* ── Parent fields (Simplified) ── */
+    const parentName = "";
+    const parentEmail = "";
+    const parentMobile = "";
 
     /* ── OTP state ── */
     const [otp, setOtp] = useState(["", "", "", "", "", ""]);
