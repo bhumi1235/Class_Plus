@@ -5,12 +5,11 @@ const API_BASE =
     typeof window !== "undefined"
         ? "/api/proxy/api"
         : (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_BASE) ||
-        "https://clussplus.auby.in/api";
+        "https://clussplus.auby.in";
 
 export const API_AUTH_BASE = API_BASE;
 export const API_FORGOT_PASSWORD_BASE = API_BASE;
 
-/** Course page data uses path android/coursepagedata/:userId (no /api prefix). */
 export const COURSE_API_BASE =
     typeof window !== "undefined"
         ? "/api/proxy"

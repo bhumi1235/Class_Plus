@@ -207,10 +207,10 @@ function mapApiCourseToItem(raw: unknown, index: number): CourseItem {
         thumbnail = `https://clussplus.auby.in${thumbnail}`;
     }
     const instructor = String(getFirst<string>(o, "instructor", "teacherName", "instructorName", "teacher_name") ?? "");
-    const price = Number(getFirst<number>(o, "price", "discountedprice", "sellingPrice", "selling_price")) || 0;
-    const originalPrice = Number(getFirst<number>(o, "originalPrice", "mrp", "actualPrice", "actual_price")) || price || 999;
+    const price = Number(getFirst<number>(o, "discountedprice", "price", "sellingPrice", "selling_price")) || 0;
+    const originalPrice = Number(getFirst<number>(o, "mrp", "originalPrice", "actualPrice", "actual_price")) || price || 999;
     const rating = Number(getFirst<number>(o, "rating", "avgRating", "avg_rating")) || 0;
-    const students = Number(getFirst<number>(o, "students", "enrolledCount", "enrolled_count")) || 0;
+    const students = Number(getFirst<number>(o, "totalenrollment", "students", "enrolledCount", "enrolled_count")) || 0;
     const duration = String(getFirst<string>(o, "duration", "courseDuration", "course_duration") ?? "");
     const isLive = Boolean(getFirst<boolean>(o, "isLive", "is_live"));
     const category = String(getFirst<string>(o, "category", "courseCategory", "course_category") ?? "");
@@ -265,26 +265,60 @@ function mapApiCourseToItem(raw: unknown, index: number): CourseItem {
 /** Extract courses array and enrolled IDs from various backend response shapes */
 function mapApiResponseToCourseData(response: unknown): { courses: CourseItem[]; enrolledIds: string[] } {
     const o = (response && typeof response === "object" ? response : {}) as Record<string, unknown>;
-    // Common shapes: { data: { courses, enrolledIds } }, { courses, enrolledCourseIds }, { result: [...] }, or array at top level
-    const data = getFirst<Record<string, unknown>>(o, "data", "result") ?? o;
-    const dataObj = (data && typeof data === "object" ? data : {}) as Record<string, unknown>;
-    let rawCourses = getFirst<unknown[]>(o, "courses") ?? getFirst<unknown[]>(dataObj, "allCourses", "courses", "courseList", "course_list", "list");
-    if (!rawCourses && Array.isArray(response)) rawCourses = response;
-    const courses = Array.isArray(rawCourses) ? rawCourses.map(mapApiCourseToItem) : [];
+    // Handle { data: [...] } or { data: { allCourses: [], mycourses: [] } }
+    const data = getFirst<unknown>(o, "data", "result") ?? o;
+
+    let rawCourses: unknown[] = [];
     let enrolledIds: string[] = [];
-    const rawEnrolled = getFirst<unknown[]>(o, "enrolledCourseIds", "enrolledIds", "enrolled_ids") ?? getFirst<unknown[]>(dataObj, "enrolledCourseIds", "enrolledIds", "enrolled_ids");
-    if (Array.isArray(rawEnrolled)) enrolledIds = rawEnrolled.map((x) => String(x));
-    else if (Array.isArray(rawCourses)) {
-        // Backend might put isEnrolled on each course
-        rawCourses.forEach((c, i) => {
+
+    if (Array.isArray(data)) {
+        // Handle { data: [ { courseCode, enrollmentStatus }, ... ] }
+        rawCourses = data;
+        data.forEach((c, i) => {
             const r = (c && typeof c === "object" ? c : {}) as Record<string, unknown>;
-            if (getFirst<boolean>(r, "isEnrolled", "is_enrolled", "enrolled")) enrolledIds.push(String(getFirst<string>(r, "id", "courseId", "course_id") ?? i + 1));
+            const isEnrolled = Number(getFirst<number>(r, "enrollmentStatus", "isEnrolled", "is_enrolled")) > 0 ||
+                Boolean(getFirst<boolean>(r, "enrolled"));
+            if (isEnrolled) {
+                enrolledIds.push(String(getFirst<string>(r, "courseCode", "id", "courseId", "course_id") ?? i + 1));
+            }
         });
+    } else if (data && typeof data === "object") {
+        const dataObj = data as Record<string, unknown>;
+        rawCourses = getFirst<unknown[]>(dataObj, "allCourses") ??
+            getFirst<unknown[]>(o, "courses") ??
+            getFirst<unknown[]>(dataObj, "courses", "courseList", "course_list", "list") ?? [];
+
+        const rawMyCourses = getFirst<unknown[]>(dataObj, "mycourses");
+        if (Array.isArray(rawMyCourses)) {
+            enrolledIds = rawMyCourses.map(c => {
+                const r = (c && typeof c === "object" ? c : {}) as Record<string, unknown>;
+                return String(getFirst<string>(r, "courseCode", "id", "courseId", "course_id"));
+            });
+        } else {
+            const rawEnrolled = getFirst<unknown[]>(o, "enrolledCourseIds", "enrolledIds", "enrolled_ids") ??
+                getFirst<unknown[]>(dataObj, "enrolledCourseIds", "enrolledIds", "enrolled_ids");
+            if (Array.isArray(rawEnrolled)) {
+                enrolledIds = rawEnrolled.map((x) => String(x));
+            } else if (Array.isArray(rawCourses)) {
+                rawCourses.forEach((c, i) => {
+                    const r = (c && typeof c === "object" ? c : {}) as Record<string, unknown>;
+                    const isEnrolled = Number(getFirst<number>(r, "enrollmentStatus", "isEnrolled", "is_enrolled")) > 0 ||
+                        Boolean(getFirst<boolean>(r, "enrolled"));
+                    if (isEnrolled) {
+                        enrolledIds.push(String(getFirst<string>(r, "id", "courseId", "course_id") ?? i + 1));
+                    }
+                });
+            }
+        }
+    } else if (Array.isArray(response)) {
+        rawCourses = response;
     }
+
+    const courses = Array.isArray(rawCourses) ? rawCourses.map(mapApiCourseToItem) : [];
     return { courses, enrolledIds };
 }
 
-const DEFAULT_COURSE_USER_ID = "ramus2026013014365210";
+const DEFAULT_COURSE_USER_ID = ""; // No default, should come from auth/env
 
 /** In the browser we use our own API proxy to avoid mixed content (HTTPS page → HTTP API). */
 function getCoursePageDataUrl(userId: string): string {
@@ -295,9 +329,14 @@ function getCoursePageDataUrl(userId: string): string {
 }
 
 export async function fetchCoursePageData(userId?: string): Promise<{ courses: CourseItem[]; enrolledIds: string[] }> {
-    const id = userId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_COURSE_USER_ID : undefined) ?? DEFAULT_COURSE_USER_ID;
-    const url = getCoursePageDataUrl(id);
+    const id = userId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_COURSE_USER_ID : undefined);
 
+    // If no ID is available, we can't fetch personalized course data.
+    if (!id) {
+        return { courses: COURSES, enrolledIds: [] };
+    }
+
+    const url = getCoursePageDataUrl(id);
     const token = typeof window !== "undefined" ? localStorage.getItem("cp_token") : null;
     const headers: Record<string, string> = {
         "Accept": "application/json"
@@ -353,8 +392,14 @@ export function useCoursePageData(userId?: string) {
     }, [userId]);
 
     useEffect(() => {
-        refetch();
-    }, [refetch]);
+        // Only run if we actually have a userId or we want to try the env fallback
+        const effectiveId = userId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_COURSE_USER_ID : undefined);
+        if (effectiveId) {
+            refetch();
+        } else {
+            setLoading(false);
+        }
+    }, [userId, refetch]);
 
     return { courses, enrolledIds, loading, error, refetch };
 }
