@@ -41,7 +41,8 @@ export function AuthModal() {
     const handleCreateAccount = () => {
         const name = nameRef.current?.value || "Student";
         const email = emailRef.current?.value || "student@classplus.com";
-        login({ name, email });
+        const studentId = `mock_${Date.now()}`;
+        login({ name, email, studentId });
         close();
         router.push("/dashboard");
     };
@@ -49,7 +50,8 @@ export function AuthModal() {
     const handleLogin = () => {
         const email = loginEmailRef.current?.value || "user@classplus.com";
         const name = email.split("@")[0];
-        login({ name, email });
+        const studentId = "rahul2026022312141072"; // Using the user's provided sample ID for testing
+        login({ name, email, studentId });
         close();
         router.push("/dashboard");
     };
