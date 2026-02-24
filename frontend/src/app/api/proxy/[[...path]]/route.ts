@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://13.60.13.116:5000";
+const BACKEND_URL = process.env.BACKEND_URL || "https://clussplus.auby.in";
 
 export const dynamic = 'force-dynamic';
 

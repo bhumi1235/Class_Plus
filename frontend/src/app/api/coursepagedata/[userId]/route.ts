@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 /** Backend base for course page data — path is android/coursepagedata/:userId (no /api). */
 const COURSE_BACKEND_BASE =
-    process.env.NEXT_PUBLIC_COURSE_API_BASE ?? process.env.BACKEND_URL ?? "http://13.60.13.116:5000";
+    process.env.NEXT_PUBLIC_COURSE_API_BASE ?? process.env.BACKEND_URL ?? "https://clussplus.auby.in";
 
 export async function GET(
     _request: NextRequest,

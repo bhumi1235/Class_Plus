@@ -204,7 +204,7 @@ function mapApiCourseToItem(raw: unknown, index: number): CourseItem {
     const description = String(getFirst<string>(o, "description", "courseDescription", "desc") ?? "");
     let thumbnail = String(getFirst<string>(o, "thumbnail", "image", "thumbnailUrl", "imageUrl", "thumbnail_url", "image_url") ?? "");
     if (thumbnail.startsWith("/")) {
-        thumbnail = `http://13.60.13.116:5000${thumbnail}`;
+        thumbnail = `https://clussplus.auby.in${thumbnail}`;
     }
     const instructor = String(getFirst<string>(o, "instructor", "teacherName", "instructorName", "teacher_name") ?? "");
     const price = Number(getFirst<number>(o, "price", "discountedprice", "sellingPrice", "selling_price")) || 0;

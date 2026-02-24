@@ -5,7 +5,7 @@ const API_BASE =
     typeof window !== "undefined"
         ? "/api/proxy/api"
         : (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_API_BASE) ||
-        "http://13.60.13.116:5000/api";
+        "https://clussplus.auby.in/api";
 
 export const API_AUTH_BASE = API_BASE;
 export const API_FORGOT_PASSWORD_BASE = API_BASE;
@@ -15,7 +15,7 @@ export const COURSE_API_BASE =
     typeof window !== "undefined"
         ? "/api/proxy"
         : (typeof process !== "undefined" && process.env?.NEXT_PUBLIC_COURSE_API_BASE) ||
-        "http://13.60.13.116:5000";
+        "https://clussplus.auby.in";
 
 export const AUTH_PATHS = {
     login: "/auth/login",
