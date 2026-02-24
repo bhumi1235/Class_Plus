@@ -49,10 +49,13 @@ export default function LoginPage() {
                 body: JSON.stringify(body),
             });
             const data = await res.json();
+            const userObj = data.user || data.userData || {};
+            const studentId = userObj.studentId || data.studentId || userObj.userId || data.userId || data.specificId || "";
+
             login({
-                name: data.user?.name || identifier.split("@")[0],
-                email: data.user?.email || identifier,
-                studentId: data.user?.studentId || data.specificId || ""
+                name: userObj.name || identifier.split("@")[0],
+                email: userObj.email || identifier,
+                studentId: studentId
             });
             if (data.token) localStorage.setItem("cp_token", data.token);
             router.push("/dashboard");

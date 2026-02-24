@@ -180,10 +180,13 @@ export default function SignupPage() {
                 localStorage.setItem("cp_token", data.token);
             }
 
+            const userObj = data.user || data.userData || {};
+            const finalStudentId = userObj.studentId || data.studentId || userObj.userId || data.userId || studentId || "";
+
             login({
-                name: data.user?.name || name,
-                email: data.user?.email || email,
-                studentId: data.user?.studentId || studentId || ""
+                name: userObj.name || name,
+                email: userObj.email || email,
+                studentId: finalStudentId
             });
 
             setStep("success");

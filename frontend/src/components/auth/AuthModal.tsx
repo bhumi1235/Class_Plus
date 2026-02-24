@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { API_AUTH_BASE, AUTH_PATHS } from "@/lib/api";
+import { Loader2, AlertCircle } from "lucide-react";
 
 export function AuthModal() {
     const { isOpen, view, close, openLogin, openSignup, openForgotPassword } = useAuthModal();
@@ -24,6 +26,10 @@ export function AuthModal() {
     const nameRef = useRef<HTMLInputElement>(null);
     const emailRef = useRef<HTMLInputElement>(null);
     const loginEmailRef = useRef<HTMLInputElement>(null);
+    const loginPasswordRef = useRef<HTMLInputElement>(null);
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     /* ── Scroll lock ── */
     useEffect(() => {
@@ -39,21 +45,46 @@ export function AuthModal() {
 
     /* ── Auth actions ── */
     const handleCreateAccount = () => {
-        const name = nameRef.current?.value || "Student";
-        const email = emailRef.current?.value || "student@classplus.com";
-        const studentId = `mock_${Date.now()}`;
-        login({ name, email, studentId });
+        // Redirect to specialized signup page for full experience
         close();
-        router.push("/dashboard");
+        router.push("/auth/signup");
     };
 
-    const handleLogin = () => {
-        const email = loginEmailRef.current?.value || "user@classplus.com";
-        const name = email.split("@")[0];
-        const studentId = "rahul2026022312141072"; // Using the user's provided sample ID for testing
-        login({ name, email, studentId });
-        close();
-        router.push("/dashboard");
+    const handleLogin = async () => {
+        const identifier = loginEmailRef.current?.value;
+        const password = loginPasswordRef.current?.value;
+        if (!identifier || !password) {
+            setError("Please enter both email/phone and password.");
+            return;
+        }
+
+        setLoading(true);
+        setError("");
+        try {
+            const res = await fetch(`${API_AUTH_BASE}${AUTH_PATHS.login}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ identifier, password, role }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || "Login failed. Please check your credentials.");
+
+            const userObj = data.user || data.userData || {};
+            const studentId = userObj.studentId || data.studentId || userObj.userId || data.userId || data.specificId || "";
+
+            login({
+                name: userObj.name || identifier.split("@")[0],
+                email: userObj.email || identifier,
+                studentId: studentId
+            });
+            if (data.token) localStorage.setItem("cp_token", data.token);
+            close();
+            router.push("/dashboard");
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const getTitle = () => {
@@ -84,6 +115,21 @@ export function AuthModal() {
                 </button>
 
                 <div className="p-8 pt-7 overflow-y-auto scrollbar-hide">
+                    {/* Error Banner */}
+                    <AnimatePresence>
+                        {error && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="mb-4 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm flex items-center gap-2"
+                            >
+                                <AlertCircle className="h-4 w-4 shrink-0" />
+                                {error}
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+
                     {/* Header */}
                     <div className="text-center mb-6">
                         <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-600 text-white font-bold text-xl mb-4 shadow-indigo-200 shadow-lg">
@@ -289,6 +335,7 @@ export function AuthModal() {
                                     <div className="relative">
                                         <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
                                         <Input
+                                            ref={loginPasswordRef}
                                             type="password"
                                             placeholder="••••••••"
                                             className="pl-10 h-11 bg-gray-50 border-gray-200 focus:bg-white transition-all rounded-xl"
@@ -299,10 +346,17 @@ export function AuthModal() {
                                 <Button
                                     type="submit"
                                     onClick={handleLogin}
+                                    disabled={loading}
                                     className="w-full h-12 rounded-xl text-base font-medium bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 shadow-lg shadow-indigo-200 mt-2"
                                 >
-                                    {role === 'parent' ? 'Continue as Parent' : 'Login'}
-                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                    {loading ? (
+                                        <Loader2 className="h-5 w-5 animate-spin" />
+                                    ) : (
+                                        <>
+                                            {role === 'parent' ? 'Continue as Parent' : 'Login'}
+                                            <ArrowRight className="ml-2 h-4 w-4" />
+                                        </>
+                                    )}
                                 </Button>
                             </>
                         )}

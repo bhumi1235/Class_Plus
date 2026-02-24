@@ -329,7 +329,7 @@ function getCoursePageDataUrl(studentId: string): string {
 }
 
 export async function fetchCoursePageData(studentId?: string): Promise<{ courses: CourseItem[]; enrolledIds: string[] }> {
-    const id = studentId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_COURSE_USER_ID : undefined);
+    const id = studentId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_STUDENT_ID : undefined);
 
     // If no ID is available, we can't fetch personalized course data.
     if (!id) {
@@ -337,6 +337,7 @@ export async function fetchCoursePageData(studentId?: string): Promise<{ courses
     }
 
     const url = getCoursePageDataUrl(id);
+    console.log("[DEBUG] Fetching course data from:", url);
     const token = typeof window !== "undefined" ? localStorage.getItem("cp_token") : null;
     const headers: Record<string, string> = {
         "Accept": "application/json"
@@ -345,12 +346,20 @@ export async function fetchCoursePageData(studentId?: string): Promise<{ courses
         headers["Authorization"] = `Bearer ${token}`;
     }
 
-    const res = await fetch(url, { headers });
-    if (!res.ok) throw new Error(`Course data failed: ${res.status}`);
-    const json: unknown = await res.json();
-    const { courses, enrolledIds } = mapApiResponseToCourseData(json);
-    setCourseDataCache(courses, enrolledIds);
-    return { courses, enrolledIds };
+    try {
+        const res = await fetch(url, { headers });
+        console.log("[DEBUG] Fetch status:", res.status);
+        if (!res.ok) throw new Error(`Course data failed: ${res.status}`);
+        const json: unknown = await res.json();
+        console.log("[DEBUG] Raw API Response:", json);
+        const { courses, enrolledIds } = mapApiResponseToCourseData(json);
+        console.log("[DEBUG] Mapped courses count:", courses.length);
+        setCourseDataCache(courses, enrolledIds);
+        return { courses, enrolledIds };
+    } catch (err) {
+        console.error("[DEBUG] Fetch error:", err);
+        throw err;
+    }
 }
 
 export function getCourses(): CourseItem[] {
