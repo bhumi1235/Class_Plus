@@ -6,13 +6,13 @@ const COURSE_BACKEND_BASE =
 
 export async function GET(
     _request: NextRequest,
-    { params }: { params: Promise<{ userId: string }> }
+    { params }: { params: Promise<{ studentId: string }> }
 ) {
-    const { userId } = await params;
-    if (!userId) {
-        return NextResponse.json({ error: "Missing userId" }, { status: 400 });
+    const { studentId } = await params;
+    if (!studentId) {
+        return NextResponse.json({ error: "Missing studentId" }, { status: 400 });
     }
-    const url = `${COURSE_BACKEND_BASE}/api/android/coursepagedata/${userId}`;
+    const url = `${COURSE_BACKEND_BASE}/api/android/coursepagedata/${studentId}`;
     try {
         const res = await fetch(url, {
             headers: { Accept: "application/json" },

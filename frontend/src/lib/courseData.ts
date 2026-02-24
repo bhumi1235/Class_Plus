@@ -318,18 +318,18 @@ function mapApiResponseToCourseData(response: unknown): { courses: CourseItem[];
     return { courses, enrolledIds };
 }
 
-const DEFAULT_COURSE_USER_ID = ""; // No default, should come from auth/env
+const DEFAULT_STUDENT_ID = ""; // No default, should come from auth/env
 
 /** In the browser we use our own API proxy to avoid mixed content (HTTPS page → HTTP API). */
-function getCoursePageDataUrl(userId: string): string {
+function getCoursePageDataUrl(studentId: string): string {
     if (typeof window !== "undefined") {
-        return `/api/proxy/api/android/coursepagedata/${encodeURIComponent(userId)}`;
+        return `/api/proxy/api/android/coursepagedata/${encodeURIComponent(studentId)}`;
     }
-    return `${COURSE_API_BASE}${COURSE_PATHS.coursePageData(userId)}`;
+    return `${COURSE_API_BASE}${COURSE_PATHS.coursePageData(studentId)}`;
 }
 
-export async function fetchCoursePageData(userId?: string): Promise<{ courses: CourseItem[]; enrolledIds: string[] }> {
-    const id = userId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_COURSE_USER_ID : undefined);
+export async function fetchCoursePageData(studentId?: string): Promise<{ courses: CourseItem[]; enrolledIds: string[] }> {
+    const id = studentId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_COURSE_USER_ID : undefined);
 
     // If no ID is available, we can't fetch personalized course data.
     if (!id) {
@@ -369,7 +369,7 @@ export function isEnrolledIn(courseId: string): boolean {
     return getEnrolledCourseIds().includes(courseId);
 }
 
-export function useCoursePageData(userId?: string) {
+export function useCoursePageData(studentId?: string) {
     const [courses, setCourses] = useState<CourseItem[]>(() => coursesCache ?? COURSES);
     const [enrolledIds, setEnrolledIds] = useState<string[]>(() => enrolledIdsCache ?? ENROLLED_COURSE_IDS);
     const [loading, setLoading] = useState(true);
@@ -379,7 +379,7 @@ export function useCoursePageData(userId?: string) {
         setLoading(true);
         setError(null);
         try {
-            const { courses: nextCourses, enrolledIds: nextEnrolledIds } = await fetchCoursePageData(userId);
+            const { courses: nextCourses, enrolledIds: nextEnrolledIds } = await fetchCoursePageData(studentId);
             setCourses(nextCourses);
             setEnrolledIds(nextEnrolledIds);
         } catch (e) {
@@ -389,17 +389,17 @@ export function useCoursePageData(userId?: string) {
         } finally {
             setLoading(false);
         }
-    }, [userId]);
+    }, [studentId]);
 
     useEffect(() => {
-        // Only run if we actually have a userId or we want to try the env fallback
-        const effectiveId = userId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_COURSE_USER_ID : undefined);
+        // Only run if we actually have a studentId or we want to try the env fallback
+        const effectiveId = studentId ?? (typeof process !== "undefined" ? process.env?.NEXT_PUBLIC_COURSE_USER_ID : undefined);
         if (effectiveId) {
             refetch();
         } else {
             setLoading(false);
         }
-    }, [userId, refetch]);
+    }, [studentId, refetch]);
 
     return { courses, enrolledIds, loading, error, refetch };
 }
